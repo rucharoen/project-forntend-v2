@@ -1,0 +1,118 @@
+/* Activity Card */
+.activity-card {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.activity-image-container {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.activity-image {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.activity-card:hover .activity-image {
+  transform: scale(1.05);
+}
+
+.activity-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.activity-card:hover .activity-overlay {
+  opacity: 1;
+}
+
+.activity-title {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.activity-modal .modal-body {
+  padding: 0;
+}
+
+.activity-modal.modal {
+  z-index: 1080;
+}
+
+.activity-modal .modal-dialog {
+  max-width: 800px;
+  margin: auto;
+}
+
+.activity-modal .modal-content {
+  background-color: transparent; /* ไม่จำเป็นถ้าใช้ div ภายในแทน */
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.activity-modal .btn-close {
+  z-index: 3;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Search Box */
+.search-container {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.search-input-group .form-control,
+.custom-datepicker .form-control,
+.form-select {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.search-input-group .form-control:focus,
+.custom-datepicker .form-control:focus,
+.form-select:focus {
+  background-color: #fff;
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.search-btn {
+  background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+  background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+}
+
+@media (max-width: 767px) {
+  .search-box-wrapper {
+    bottom: 0 !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* react-datepicker */
+.react-datepicker-wrapper {
+  display: flex !important;
+}
