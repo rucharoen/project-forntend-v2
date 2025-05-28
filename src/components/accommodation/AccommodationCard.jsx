@@ -1,93 +1,155 @@
-// AccommodationCard.jsx
-import { useNavigate, createSearchParams } from 'react-router-dom';
-
-import Button from 'react-bootstrap/Button';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const AccommodationCard = ({ accommodation, availabilityRooms }) => {
-    const fullImageUrl = `${BASE_URL}/uploads/accommodations/${accommodation.image_name}`;
+const AccommodationCard = ({ accommodation }) => {
+  const images = accommodation.images || []; // สมมติ accommodation.images เป็น array ของชื่อรูป
+  const imagesToShow = images.slice(0, 3); // แสดงแค่ 3 รูปแรก
 
-    const navigate = useNavigate();
-    // original_price และ discount (%) มีอยู่ใน accommodation
-    const originalPrice = accommodation.price_per_night;
-    const discountPercent = accommodation.discount;
+  const originalPrice = accommodation.price_per_night;
+  const discountPercent = accommodation.discount;
 
-    // คำนวณราคาหลังหักส่วนลด
-    // ตรวจสอบให้แน่ใจว่าเป็นตัวเลขก่อนคำนวณและใช้ toLocaleString()
-    const discountedPrice = (originalPrice && typeof originalPrice === 'number' && discountPercent && typeof discountPercent === 'number')
-        ? Math.round(originalPrice * (1 - discountPercent / 100))
-        : (typeof accommodation.price_per_night === 'number' ? accommodation.price_per_night : 0); // fallback to 0 or handle error
+  const hasDiscount = originalPrice && discountPercent;
+  const discountedPrice = hasDiscount
+    ? Math.round(originalPrice * (1 - discountPercent / 100))
+    : originalPrice;
 
-    const handleRedirect = (id) => {
-        navigate({
-        pathname: '/book',
-        search: createSearchParams({ id: id }).toString()
-        });
-    };
-    return (
-        <div className="col-lg-6 px-2 py-2">
-            <div className="border rounded p-2 shadow-sm h-100">
-                <Row>
-                    {/* รูปภาพที่พัก */}
-                    <Col md={5}>
-                        <img src={fullImageUrl} alt={accommodation.name} className="img-fluid rounded" />
-                    </Col>
-
-                    {/* ข้อมูลที่พัก */}
-                    <Col md={7}>
-                        <h5>
-                            {accommodation.name}
-                            <small className="text-muted"> ({accommodation.type.name})</small>
-                        </h5>
-                        <p className="mb-1">ห้องว่าง : {availabilityRooms} ห้อง</p>
-
-                        <ul className="list-unstyled mb-2">
-                            <li>📐 ขนาดห้อง {accommodation.room_size} ตารางเมตร</li>
-                            <li>🌄 วิว : {accommodation.room_view}</li>
-                            <li>🛏 {accommodation.bed_type}</li>
-                        </ul>
-
-                        {/* ราคาหลังส่วนลด */}
-                        <div className="d-flex align-items-baseline mb-2">
-                            {originalPrice && discountPercent && (
-                                <>
-                                    <span className="text-decoration-line-through text-secondary me-2">
-                                        {/* ตรวจสอบว่าเป็น number ก่อนเรียก toLocaleString */}
-                                        {typeof originalPrice === 'number' ? originalPrice.toLocaleString() : ''}
-                                    </span>
-                                    <span className="text-danger fw-bold me-3">
-                                        -{discountPercent}%
-                                    </span>
-                                </>
-                            )}
-                            <span
-                                className={`h5 fw-bold ${discountPercent ? "text-danger" : "text-success"
-                                }`}
-                            >
-                                {/* ตรวจสอบว่าเป็น number ก่อนเรียก toLocaleString */}
-                                {typeof discountedPrice === 'number' ? discountedPrice.toLocaleString() : ''} บาท
-                            </span>
-                        </div>
-
-                        <small className="text-muted">รวมค่าธรรมเนียมและภาษีแล้ว</small>
-
-                        {/* ปุ่ม */}
-                        <div className="mt-3 d-flex gap-2">
-                            <Button variant="outline-secondary">
-                                <i className="bi bi-book me-2"></i>รายละเอียดห้องพัก
-                            </Button>
-                            <Button variant="primary" onClick={() => handleRedirect(accommodation.id)}>
-                                <i className="bi bi-hand-index-thumb me-2"></i>จองเลย
-                            </Button>
-                        </div>
-                    </Col>
-                </Row>
-            </div>
+  return (
+    <Col
+      xs={12}
+      sm={6}
+      md={4}
+      className="d-flex justify-content-center mb-4 mt-5 g-1"
+    >
+      <div
+        className="card h-100 border-0 d-flex flex-column position-relative"
+        style={{
+          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
+          borderRadius: "0.5rem",
+          width: "410px",
+          height: "521px",
+        }}
+      >
+        {/* ป้ายโปรโมชั่น */}
+        <div
+          className="position-absolute bg-danger text-white px-3 py-1"
+          style={{
+            borderTopLeftRadius: "0.4rem",
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            zIndex: 10,
+          }}
+        >
+          โปรโมชั่น
         </div>
-    );
+
+        {/* แสดงรูปภาพ 3 รูป */}
+        <div
+          className="d-flex"
+          style={{
+            height: "276px",
+            overflow: "hidden",
+            borderTopLeftRadius: "0.5rem",
+            borderTopRightRadius: "0.5rem",
+          }}
+        >
+          {imagesToShow.length > 0 ? (
+            imagesToShow.map((img, idx) => (
+              <img
+                key={idx}
+                src={`${BASE_URL}/uploads/accommodations/${img}`}
+                alt={`${accommodation.name} ภาพที่ ${idx + 1}`}
+                style={{
+                  width: `${100 / imagesToShow.length}%`,
+                  objectFit: "cover",
+                  borderRadius:
+                    idx === 0
+                      ? "0.5rem 0 0 0.5rem"
+                      : idx === imagesToShow.length - 1
+                      ? "0 0.5rem 0.5rem 0"
+                      : "0",
+                }}
+              />
+            ))
+          ) : (
+            <img
+              src={`${BASE_URL}/uploads/accommodations/${accommodation.image_name}`}
+              alt={accommodation.name}
+              className="card-img-top rounded-top"
+              style={{
+                height: "276px",
+                objectFit: "cover",
+                borderRadius: "0.5rem 0.5rem 0 0",
+                width: "100%",
+              }}
+            />
+          )}
+        </div>
+
+        {/* เนื้อหา */}
+        <div className="card-body d-flex flex-column">
+          <h6 className="card-title fw-bold mb-2" style={{ fontSize: "2rem" }}>
+            {accommodation.name}
+          </h6>
+
+          <p
+            className="text-warning mb-1"
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "500",
+              color: "rgba(255, 110, 0, 1)",
+            }}
+          >
+            {accommodation.promotion_detail || "โปรโมชั่นพิเศษ"}
+          </p>
+          <p className="text-muted mb-1" style={{ fontSize: "0.95rem" }}>
+            {accommodation.promotion_date || "1 เม.ย. - 31 ส.ค. 2568"}
+          </p>
+          <p className="text-muted mb-2" style={{ fontSize: "0.95rem" }}>
+            รวมอาหารเช้า
+          </p>
+        </div>
+
+        {/* ปุ่มด้านล่างเต็มความกว้าง */}
+        <div className="d-flex w-100">
+          <span
+            className="fw-bold text-center"
+            style={{
+              backgroundColor: "white",
+              color: "rgba(91, 155, 43, 1)",
+              border: "1px solid rgba(91, 155, 43, 1)",
+              width: "50%",
+              padding: "0.375rem 0.75rem",
+              borderRadius: "0 0 0 0.375rem",
+              fontSize: "1rem",
+              whiteSpace: "nowrap",
+            }}
+          >
+            ประหยัด {discountPercent}%
+          </span>
+
+          <a
+            href="http://localhost:1111/search-results?destination=&guests=1&checkIn=2025-05-17&checkOut=2025-05-18"
+            className="fw-bold text-white text-decoration-none"
+            style={{
+              backgroundColor: "rgba(0, 196, 255, 1)",
+              borderColor: "rgba(0, 196, 255, 1)",
+              width: "50%",
+              borderRadius: "0 0 0.375rem 0",
+              fontSize: "1.05rem",
+              whiteSpace: "nowrap",
+              display: "inline-block",
+              textAlign: "center",
+              padding: "0.5rem 1rem",
+            }}
+          >
+            จองเลยตอนนี้
+          </a>
+        </div>
+      </div>
+    </Col>
+  );
 };
 
 export default AccommodationCard;

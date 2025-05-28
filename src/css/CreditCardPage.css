@@ -1,0 +1,4 @@
+/* CreditCardPage.css */
+form input::placeholder {
+  color: #ccc;
+}

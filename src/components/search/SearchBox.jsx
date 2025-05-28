@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { InputGroup, FormControl, Form, Row, Col, Button } from 'react-bootstrap';
-import DatePicker, { registerLocale } from 'react-datepicker';
-import formatToBE from '../../utils/FormatToBE';
-import 'react-datepicker/dist/react-datepicker.css';
-import dayjs from 'dayjs';
-import 'dayjs/locale/th';
-import th from 'date-fns/locale/th';
-import TypeService from '../../services/api/accommodation/type.service';
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import dayjs from "dayjs";
+import "dayjs/locale/th";
+import th from "date-fns/locale/th";
+import TypeService from "../../services/api/accommodation/type.service";
+import "../../css/SearchBox.css";
+import { IconCalendarDown, IconCalendarUp, IconUser, IconDoor } from "@tabler/icons-react";
+import { createPortal } from "react-dom";
 
-registerLocale('th', th);
+registerLocale("th", th);
 
 const SearchBox = ({ resetFilter }) => {
   const navigate = useNavigate();
@@ -17,254 +18,198 @@ const SearchBox = ({ resetFilter }) => {
 
   const [checkInDate, setCheckInDate] = useState(null);
   const [checkOutDate, setCheckOutDate] = useState(null);
+  const [dateError, setDateError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [destination, setDestination] = useState('');
-  const [guests, setGuests] = useState(1);
-
+  const [destination, setDestination] = useState("");
   const [types, setTypes] = useState([]);
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState("");
+  const [showCalendar, setShowCalendar] = useState(false);
 
+  const [guestPopupVisible, setGuestPopupVisible] = useState(false);
+  const [guestPopupPos, setGuestPopupPos] = useState({ top: 0, left: 0 });
+  const [roomsCount, setRoomsCount] = useState(1);
+  const [adultsCount, setAdultsCount] = useState(2);
+  const [childrenCount, setChildrenCount] = useState(0);
+
+  const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });
+  const dateButtonRef = useRef(null);
+  const guestButtonRef = useRef(null);
   const today = new Date();
 
+  // ✅ โหลดค่าจาก URL params
   useEffect(() => {
-    const initialDestination = searchParams.get('destination') || '';
-    const initialGuests = parseInt(searchParams.get('guests')) || 1;
-    const initialCheckIn = searchParams.get('checkIn');
-    const initialCheckOut = searchParams.get('checkOut');
+    const initType = searchParams.get("destination") || "";
+    const checkInParam = searchParams.get("checkIn");
+    const checkOutParam = searchParams.get("checkOut");
+    const guestsParam = parseInt(searchParams.get("guests")) || null;
 
-    setDestination(initialDestination);
-    setGuests(initialGuests);
+    setDestination(initType);
+    setSelectedType(initType);
 
-    if (initialCheckIn) {
-      setCheckInDate(dayjs(initialCheckIn).toDate());
-    } else {
-      setCheckInDate(dayjs().add(1, 'day').toDate());
+    if (checkInParam) {
+      const checkIn = dayjs(checkInParam, "YYYY-MM-DD").toDate();
+      setCheckInDate(checkIn);
     }
 
-    if (initialCheckOut) {
-      setCheckOutDate(dayjs(initialCheckOut).toDate());
-    } else {
-      setCheckOutDate(dayjs().add(2, 'day').toDate());
+    if (checkOutParam) {
+      const checkOut = dayjs(checkOutParam, "YYYY-MM-DD").toDate();
+      setCheckOutDate(checkOut);
+    }
+
+    if (guestsParam) {
+      const baseRooms = 1;
+      const baseAdults = Math.max(1, guestsParam - baseRooms);
+      setRoomsCount(baseRooms);
+      setAdultsCount(baseAdults);
+      setChildrenCount(0); // ไม่มีแยก children ใน URL
     }
   }, [searchParams]);
 
+  // โหลดประเภทห้อง
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        const response = await TypeService.getAll();
-        setTypes(response.data);
-      } catch (error) {
-        console.error("Failed to load types:", error);
+        const { data } = await TypeService.getAll();
+        setTypes(data);
+      } catch (err) {
+        console.error(err);
       }
     };
-
     fetchTypes();
   }, []);
 
+  // ปิดปฏิทินเมื่อคลิกรอบนอก
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.dropdown-container-type')) {
-        setShowTypeDropdown(false);
-      }
+    const handler = (e) => {
+      if (
+        dateButtonRef.current &&
+        !dateButtonRef.current.contains(e.target) &&
+        !e.target.closest('.calendar-popover')
+      ) setShowCalendar(false);
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  // ปิด popup ผู้เข้าพักเมื่อคลิกรอบนอก
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.guest-selector') && !e.target.closest('.guest-popup')) {
+        setGuestPopupVisible(false);
+      }
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
 
+  const toggleCalendar = () => {
+    if (!showCalendar && dateButtonRef.current) {
+      const rect = dateButtonRef.current.getBoundingClientRect();
+      setCalendarPos({ top: rect.bottom + window.scrollY + 8, left: rect.left + window.scrollX });
+    }
+    setShowCalendar(prev => !prev);
+    setDateError(false);
+  };
+
+  const handleCheckInDate = (date) => {
+    setCheckInDate(date);
+    if (checkOutDate && dayjs(date).isAfter(dayjs(checkOutDate))) {
+      setCheckOutDate(date);
+    }
+  };
+  const handleCheckOutDate = (date) => setCheckOutDate(date);
+
+  const handleTypeChange = e => {
+    setSelectedType(e.target.value);
+    setDestination(e.target.value);
+  };
+
+  const toggleGuestPopup = e => {
+    e.stopPropagation();
+    if (!guestPopupVisible && guestButtonRef.current) {
+      const rect = guestButtonRef.current.getBoundingClientRect();
+      setGuestPopupPos({ top: rect.bottom + window.scrollY + 8, left: rect.left + window.scrollX });
+    }
+    setGuestPopupVisible(prev => !prev);
+  };
+
+  const changeCount = (key, delta) => {
+    if (key === 'rooms') setRoomsCount(prev => Math.max(1, prev + delta));
+    if (key === 'adults') setAdultsCount(prev => Math.max(1, prev + delta));
+    if (key === 'children') setChildrenCount(prev => Math.max(0, prev + delta));
+  };
+
+  const handleSearch = async e => {
+    e.preventDefault();
+    if (!checkInDate || !checkOutDate) {
+      setDateError(true);
+      return;
+    }
+    setLoading(true);
+    const totalGuests = roomsCount + adultsCount + childrenCount;
     const params = new URLSearchParams({
       destination,
-      guests,
+      guests: totalGuests,
       checkIn: dayjs(checkInDate).format('YYYY-MM-DD'),
-      checkOut: dayjs(checkOutDate).format('YYYY-MM-DD'),
+      checkOut: dayjs(checkOutDate).format('YYYY-MM-DD')
     });
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    navigate(`/search-results?${params.toString()}`);
+    await new Promise(r => setTimeout(r, 1000));
+    navigate(`/search-results?${params}`);
     setLoading(false);
   };
 
-  const handleCheckInDateChange = (date) => {
-    setCheckInDate(date);
-    if (!checkOutDate || dayjs(checkOutDate).isSame(date) || dayjs(checkOutDate).isBefore(date)) {
-      const nextDate = dayjs(date).add(1, 'day').toDate();
-      setCheckOutDate(nextDate);
-    }
-  };
-
-  const handleCheckOutDateChange = (date) => {
-    setCheckOutDate(date);
-  };
-
-  const handleTypeSelect = (typeName) => {
-    setSelectedType(typeName);
-    setDestination(typeName);
-    setShowTypeDropdown(false);
-  };
-
-  const handleDestinationChange = (e) => {
-    setDestination(e.target.value);
-    setSelectedType('');
-  };
-
-  const CheckInDateInput = ({ value, onClick, placeholder, disabled }) => (
-    <InputGroup className="custom-datepicker" onClick={onClick}>
-      <InputGroup.Text className="bg-white border-end-0">
-        <i className="bi bi-calendar-event text-primary"></i>
-      </InputGroup.Text>
-      <FormControl
-        placeholder={placeholder}
-        value={value}
-        readOnly
-        disabled={disabled}
-        className="py-3 fs-6 border-start-0 shadow-sm"
-      />
-    </InputGroup>
-  );
-
-  const CheckOutDateInput = ({ value, onClick, placeholder, disabled }) => (
-    <InputGroup className="custom-datepicker" onClick={onClick}>
-      <InputGroup.Text className="bg-white border-end-0">
-        <i className="bi bi-calendar-event text-primary"></i>
-      </InputGroup.Text>
-      <FormControl
-        placeholder={placeholder}
-        value={value}
-        readOnly
-        disabled={disabled}
-        className="py-3 fs-6 border-start-0 shadow-sm"
-      />
-    </InputGroup>
-  );
-
   return (
-    <div className="search-container bg-white p-4 rounded-4 shadow-lg mb-4 mt-4">
-      <Form onSubmit={handleSearch}>
-        <Row className="align-items-end g-3">
-          <Col xs={12} md={6} lg={4}>
-            <Form.Group className="position-relative dropdown-container-type">
-              <Form.Label className="mb-2 fw-semibold text-secondary d-flex align-items-center gap-2">
-                ประเภทห้องพัก
-              </Form.Label>
-              <InputGroup>
-                <InputGroup.Text className="bg-white border-end-0">
-                  <i className="bi bi-search text-muted"></i>
-                </InputGroup.Text>
-                <FormControl
-                  type="text"
-                  placeholder="ค้นหาประเภท ชื่อห้องพัก เมือง หรือจังหวัด"
-                  value={destination}
-                  onChange={handleDestinationChange}
-                  onClick={() => setShowTypeDropdown(true)}
-                  className="py-3 fs-6 border-start-0"
-                  autoComplete="off"
-                />
-              </InputGroup>
+    <div className={`searchbox-container${dateError ? ' error' : ''}`}>
+      <form onSubmit={handleSearch}>
+        {dateError && <div className="date-error">กรุณากรอกข้อมูลวันที่ต้องการเข้าพัก</div>}
 
-              {showTypeDropdown && types.length > 0 && (
-                <div
-                  className="position-absolute w-100 bg-white border rounded mt-1 shadow-sm"
-                  style={{ zIndex: 1000, maxHeight: '250px', overflowY: 'auto' }}
-                >
-                  {types.map((type, idx) => (
-                    <div
-                      key={idx}
-                      className={`p-2 border-bottom hover-bg-light ${selectedType === type.name ? 'bg-light' : ''}`}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => handleTypeSelect(type.name)}
-                    >
-                      <i className="bi bi-arrow-right-short me-2 text-primary"></i>
-                      {type.name}
-                    </div>
-                  ))}
+        <div className="searchbox-row">
+          <div className="searchbox-col date">
+            <div className="agoda-date-container">
+              <button type="button" className="agoda-date-button" onClick={toggleCalendar} ref={dateButtonRef}>
+                <IconCalendarUp stroke={2} size={32} /><span className="calendar-text">{checkInDate ? dayjs(checkInDate).format('DD/MM/YYYY') : '  วันเช็คอิน'}</span>
+              </button>
+              <div>|</div>
+              <button type="button" className="agoda-date-button" onClick={toggleCalendar}>
+                <IconCalendarDown stroke={2} size={32} /><span className="calendar-text">{checkOutDate ? dayjs(checkOutDate).format('DD/MM/YYYY') : 'วันเช็คเอาท์'}</span>
+              </button>
+            </div>
+            {showCalendar && createPortal(
+              <div className="calendar-popover" style={{ top: calendarPos.top, left: calendarPos.left }}>
+                <div className="calendar-wrapper">
+                  <div><label>เช็คอิน</label><DatePicker inline locale="th" selected={checkInDate} onChange={handleCheckInDate} minDate={today} dateFormat="dd/MM/yyyy" /></div>
+                  <div><label>เช็คเอาท์</label><DatePicker inline locale="th" selected={checkOutDate} onChange={handleCheckOutDate} minDate={checkInDate || today} dateFormat="dd/MM/yyyy" /></div>
                 </div>
-              )}
-            </Form.Group>
-          </Col>
+              </div>, document.body)}
+          </div>
 
-          <Col xs={12} sm={6} md={3} lg={3}>
-            <Form.Group>
-              <Form.Label className="mb-2 fw-semibold text-secondary">เช็คอิน</Form.Label>
-              <DatePicker
-                selected={checkInDate}
-                onChange={handleCheckInDateChange}
-                selectsStart
-                startDate={checkInDate}
-                endDate={checkOutDate}
-                minDate={today}
-                dateFormat="dd/MM/yyyy"
-                placeholderText="เลือกวันที่"
-                locale="th"
-                customInput={CheckInDateInput({ placeholder: formatToBE(checkInDate) })}
-                popperPlacement="bottom-start"
-              />
-            </Form.Group>
-          </Col>
+          <div className="searchbox-col type">
+            <div className="select-with-icon">
+              <IconDoor className="select-icon" stroke={2} size={32} />
+              <select value={selectedType} onChange={handleTypeChange} className="select-input has-icon">
+                <option value="">ประเภทห้อง: ทั้งหมด</option>
+                {types.map((t, i) => <option key={i} value={t.name}>{t.name}</option>)}
+              </select>
+            </div>
+          </div>
 
-          <Col xs={12} sm={6} md={3} lg={3}>
-            <Form.Group>
-              <Form.Label className="mb-2 fw-semibold text-secondary">เช็คเอาท์</Form.Label>
-              <DatePicker
-                selected={checkOutDate}
-                onChange={handleCheckOutDateChange}
-                selectsEnd
-                startDate={checkInDate}
-                endDate={checkOutDate}
-                minDate={dayjs(checkInDate).add(1, 'day').toDate()}
-                dateFormat="dd/MM/yyyy"
-                placeholderText="เลือกวันที่"
-                locale="th"
-                disabled={!checkInDate}
-                customInput={CheckOutDateInput({ placeholder: formatToBE(checkOutDate), disabled: !checkInDate })}
-                popperPlacement="bottom-start"
-              />
-            </Form.Group>
-          </Col>
+          <div className="searchbox-col guests" style={{ position: 'relative' }}>
+            <div className="guest-selector" onClick={toggleGuestPopup} ref={guestButtonRef}>
+              <IconUser stroke={2} size={32} /><span>{`${roomsCount} ห้อง, ${adultsCount} ผู้ใหญ่${childrenCount > 0 ? `, ${childrenCount} เด็ก` : ``}`}</span>
+            </div>
+            {guestPopupVisible && createPortal(
+              <div className="guest-popup" style={{ top: guestPopupPos.top, left: guestPopupPos.left }}>
+                {[{ label: 'ห้อง', key: 'rooms', val: roomsCount }, { label: 'ผู้ใหญ่', key: 'adults', val: adultsCount }, { label: 'เด็ก', key: 'children', val: childrenCount }].map(({ label, key, val }) =>
+                  <div key={key} className="guest-row"><span>{label}</span><div className="counter"><button onClick={e => { e.stopPropagation(); changeCount(key, -1) }}>-</button><span>{val}</span><button onClick={e => { e.stopPropagation(); changeCount(key, 1) }}>+</button></div></div>
+                )}
+              </div>, document.body)}
+          </div>
 
-          <Col xs={12} md={6} lg={2}>
-            <Form.Group>
-              <Form.Label className="mb-2 fw-semibold text-secondary">ผู้เข้าพัก</Form.Label>
-              <InputGroup>
-                <InputGroup.Text className="bg-white border-end-0">
-                  <i className="bi bi-person text-muted"></i>
-                </InputGroup.Text>
-                <Form.Select
-                  className="py-3 fs-6 border-start-0"
-                  value={guests}
-                  onChange={(e) => setGuests(parseInt(e.target.value))}
-                >
-                  <option value={1}>1 ผู้ใหญ่</option>
-                  <option value={2}>2 ผู้ใหญ่</option>
-                  <option value={3}>3 ผู้ใหญ่</option>
-                  <option value={4}>4 ผู้ใหญ่</option>
-                </Form.Select>
-              </InputGroup>
-            </Form.Group>
-          </Col>
-
-          <Col xs={12} md={6} lg={2} className="d-flex align-items-end">
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-100 d-flex align-items-center justify-content-center gap-2 py-3 fs-6 rounded-3 fw-bold"
-              disabled={loading}
-              onClick={resetFilter}
-            >
-              {loading ? (
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              ) : (
-                <i className="bi bi-search"></i>
-              )}
-              <span>ค้นหา</span>
-            </Button>
-          </Col>
-        </Row>
-      </Form>
+          <div className="searchbox-col button">
+            <button className="search-button" type="submit" disabled={loading}>{loading ? 'กำลังค้นหา' : 'ค้นหา'}</button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 };

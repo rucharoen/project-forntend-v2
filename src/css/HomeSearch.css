@@ -1,0 +1,32 @@
+.search-box {
+  position: absolute;
+  top: 490px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  gap: 10px;
+
+}
+.container {
+  max-width: 1400px;
+}
+
+.Accommodation {
+    margin-top: 110px;
+
+}
+
+/* เปลี่ยนสีเส้นขีดใต้แบบกำหนดเอง */
+.border-primary-custom {
+  border-bottom-color: rgba(0, 196, 255, 1) !important;
+}
+
+
+@media (max-width: 812px) {
+  .search-box{
+    top: 400px;
+  }
+  
+}

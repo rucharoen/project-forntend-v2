@@ -1,0 +1,345 @@
+.searchbox-container {
+  background: rgba(207, 244, 255, 1);
+  padding: 0.7rem ;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-block: 2rem;
+  max-width: 1200px;
+  margin-inline: auto;
+  width: 100%;
+  overflow-x: auto;
+  align-items: center;
+}
+
+.searchbox-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.searchbox-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+/* กำหนดความกว้างแบบตามสัดส่วน */
+.searchbox-col.date {
+  flex: 0 0 35%;
+  min-width: 220px;
+}
+
+.select-with-icon {
+  min-width: 180px;
+}
+
+.searchbox-col.type,
+.searchbox-col.guests {
+  flex: 0 0 25%;
+  min-width: 180px;
+  color: rgba(121, 121, 121, 1);
+  
+}
+
+.select-input.has-icon {
+min-height: 65px;
+}
+
+.searchbox-col.button {
+  flex: 0 0 10%;
+  min-width: 119px;
+  display: flex;
+  align-items: center;    
+  justify-content: center;
+  padding-top: 0;    
+  height: 100%;     
+  box-sizing: border-box;
+}
+
+
+.select-input {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  min-width: 294.4px;
+  appearance: none;        /* สำหรับ Firefox */
+  -webkit-appearance: none; /* สำหรับ Safari และ Chrome */
+  -moz-appearance: none;   /* สำหรับ Firefox */
+  background-image: none;  /* ลบไอคอนออก */
+}
+
+.calendar-text {
+  margin-left: 8px; 
+  font-size: 1.375rem;
+  color: rgba(121, 121, 121, 1);
+}
+
+.search-button {
+  padding: 0.75rem;
+  font-size: 1.375rem;
+  background: rgba(0, 186, 242, 1);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;     
+  height: 65px;   
+  box-sizing: border-box;
+  margin: 0;     
+  line-height: normal; 
+  display: flex;   
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.agoda-date-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 10px;
+  width: 100%;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  min-height: 65px;
+  min-width: 0;
+  
+}
+
+.agoda-date-button {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding: 2px 10px;
+  font-size: 1.375rem;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  color: rgba(121, 121, 121, 1);
+}
+
+.calendar-popover {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  z-index: 999;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  
+  
+}
+
+
+
+.calendar-wrapper {
+  display: flex;
+  gap: 24px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  
+}
+
+.calendar-wrapper > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.calendar-wrapper label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #444;
+  font-size: 1rem;
+}
+
+.react-datepicker {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Sarabun", sans-serif;
+}
+
+.react-datepicker__header {
+  background-color: #00baf2;
+  color: white;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 10px 0;
+}
+
+.react-datepicker__current-month {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #00baf2;
+  color: white;
+  border-radius: 8px;
+}
+
+.react-datepicker__day:hover {
+  background-color: #99d9f5;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.guest-selector {
+  background-color: #fff;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 180px;
+  font-size: 1.375rem;
+  min-height: 65px;
+}
+
+.guest-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+   min-width: 240px;
+  
+}
+
+.guest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.counter button {
+  background: #eee;
+  border: 1px solid #aaa;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.select-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+}
+
+.select-icon {
+  position: absolute;
+  left: 12px;
+  pointer-events: none;
+  color:rgba(121, 121, 121, 1);
+}
+
+/* ควรใช้ที่ select แทน */
+.select-input {
+  font-size: 1.375rem;
+  color: rgba(121, 121, 121, 1);
+}
+
+.select-input.has-icon {
+  padding-left: 40px; /* เว้นที่ให้ icon */
+}
+
+.date-error {
+  color: red;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.searchbox-container.error {
+  border: 2px solid red;
+}
+
+
+/* Responsive (หน้าจอเล็กให้เลื่อนได้แนวนอน ไม่ตกบรรทัด) */
+@media (max-width: 812px) {
+  .searchbox-row {
+    flex-direction: column; /* เปลี่ยนจากแถวเป็นคอลัมน์ */
+    gap: 1rem;
+  }
+
+  .searchbox-col {
+    flex: 0 0 100%;     /* ให้ความกว้างเต็ม */
+    width: 100%;
+    min-width: unset;   /* ยกเลิก min-width เดิม */
+    align-items: stretch;
+  }
+
+  .agoda-date-container,
+  .guest-selector,
+  .select-input,
+  .search-button {
+    width: 100%;
+  }
+
+  .searchbox-col.button {
+    padding-top: 0;
+    height: auto;
+  }
+
+  .calendar-popover {
+    left: 50% !important;
+    transform: translateX(-50%);
+  }
+
+  .guest-popup {
+    left: 50% !important;
+    transform: translateX(-50%);
+  }
+}

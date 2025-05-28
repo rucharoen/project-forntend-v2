@@ -24,31 +24,32 @@ const Accommodation = () => {
     };
 
     return (
-        <div className="row">
-            {loading ? (
-                <div className="text-center my-5">
-                    <Spinner animation="border" variant="primary" />
-                </div>
-            ) : (
-                <>
-                    {accommodations.length > 0 ? (
-                        accommodations.map((acc) => (
-                            <AccommodationCard
-                                key={acc.id}
-                                accommodation={acc}
-                            />
-                        ))
-                    ) : (
-                        <div className="text-center col-12">
-                            <p className="text-danger">
-                                ไม่สามารถโหลดข้อมูลห้องพักได้
-                            </p>
-                        </div>
-                    )}
-                </>
-            )}
-        </div>
-    );
+    <div className="row">
+        {loading ? (
+            <div className="text-center my-5">
+                <Spinner animation="border" variant="primary" />
+            </div>
+        ) : (
+            <>
+                {accommodations.length > 0 ? (
+                    accommodations.slice(0, 3).map((acc) => (
+                        <AccommodationCard
+                            key={acc.id}
+                            accommodation={acc}
+                        />
+                    ))
+                ) : (
+                    <div className="text-center col-12">
+                        <p className="text-danger">
+                            ไม่สามารถโหลดข้อมูลห้องพักได้
+                        </p>
+                    </div>
+                )}
+            </>
+        )}
+    </div>
+);
+
 };
 
 export default Accommodation;

@@ -10,7 +10,7 @@ import AuthLayout from "../layouts/auth/AuthLayout"
 import HomePage from "../pages/main/home/HomePage"
 import LoginPage from "../pages/main/auth/LoginPage"
 import SearchPage from "../pages/main/search/SearchPage"
-import BookPage from "../pages/main/book/BookPage"
+import BookPage from "../pages/main/Book/BookPage"
 
 // Auth Routes
 import MyBookingPage from "../pages/auth/MyBookingPage"

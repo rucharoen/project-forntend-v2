@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.33.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.5",
     "bootstrap-icons": "^1.12.1",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "frontend": "file:",
     "rc-slider": "^11.1.8",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",

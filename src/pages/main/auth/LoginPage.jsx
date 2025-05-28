@@ -1,113 +1,141 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AuthService from '../../../services/auth/auth.service';
-// เราสามารถนำเข้าไอคอนโดยตรงจาก react-bootstrap-icons (หากติดตั้งแล้ว)
-// import { Envelope, Lock, Eye, EyeSlash, CheckCircleFill, ExclamationTriangleFill } from 'react-bootstrap-icons';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthService from "../../../services/auth/auth.service";
 
-const LoginPage = () => {
+
+const LoginPage = ({ closeLogin }) => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState('');
+  const [loginError, setLoginError] = useState("");
+  const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    document.title = "เข้าสู่ระบบ | บาราลี รีสอร์ท เกาะช้าง";
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
 
-    // ตรวจสอบอีเมล
     if (!email) {
-      newErrors.email = 'กรุณากรอกอีเมล';
+      newErrors.email = "กรุณากรอกอีเมล";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'รูปแบบอีเมลไม่ถูกต้อง';
+      newErrors.email = "รูปแบบอีเมลไม่ถูกต้อง";
     } else if (/[ก-๙]/.test(email)) {
-      newErrors.email = 'อีเมลต้องไม่ประกอบด้วยอักษรภาษาไทย';
+      newErrors.email = "อีเมลต้องไม่ประกอบด้วยอักษรภาษาไทย";
     }
 
     if (!password) {
-      newErrors.password = 'กรุณากรอกรหัสผ่าน';
+      newErrors.password = "กรุณากรอกรหัสผ่าน";
     }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
-      setLoginError('');
-
+      setLoginError("");
       try {
         const user = await AuthService.login(email, password);
         if (user) {
-          // แสดง toast notification แทน alert
-          const successToast = document.getElementById('successToast');
-          if (successToast) {
-            successToast.classList.add('show');
-            // ตั้งเวลาซ่อน toast หลังจาก 3 วินาที
-            setTimeout(() => {
-              successToast.classList.remove('show');
-            }, 3000);
-          }
+          setShowToast(true);
 
-          // รอสักครู่ก่อนที่จะ navigate
           setTimeout(() => {
-            navigate("/", { replace: true });
-            window.location.reload();
-          }, 1500);
+            setShowToast(false);
+            window.location.reload(); // ✅ รีเฟรชหน้าเว็บทันทีหลังล็อกอิน
+          }, 3000);
         }
       } catch (error) {
-        console.error('Login error:', error);
-        setLoginError(error.response?.data?.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง');
+        console.error("Login error:", error);
+        setLoginError(
+          error.response?.data?.message ||
+            "เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง"
+        );
       } finally {
         setIsLoading(false);
       }
     }
   };
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const toggleShowPassword = () => setShowPassword(!showPassword);
 
   return (
-    <div className="py-2">
-      <div className="row justify-content-center">
-        <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-          <div className="card border-0">
-            <div className="card-body p-4 p-md-5">
-              <h2 className="fw-bold mb-4 text-center">เข้าสู่ระบบ</h2>
+    <>
+      {/* Modal */}
+      <div
+        className="modal fade show d-block"
+        tabIndex="-1"
+        role="dialog"
+        style={{ background: "rgba(0,0,0,0.3)", minHeight: "100vh" }}
+      >
+        <div className="modal-dialog modal-dialog-centered" role="document">
+          <div className="modal-content border-0 rounded-3 p-4">
+            <button
+              type="button"
+              className="btn-close position-absolute end-0 m-3 z-3"
+              onClick={closeLogin} // ✅ ใช้งานได้แน่นอน
+              aria-label="Close"
+            ></button>
+
+            <div className="modal-body text-center">
+              <img
+                src="https://www.baraliresort.com/images/logo.png"
+                alt="logo"
+                width="113"
+                height="88"
+                className="mb-3"
+              />
+              <h5 className="fw-bold mb-3">เข้าสู่ระบบ</h5>
+              <p className="text-muted mb-4">กรุณากรอกข้อมูลเพื่อเข้าสู่ระบบ</p>
 
               {loginError && (
-                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                <div
+                  className="alert alert-danger alert-dismissible fade show"
+                  role="alert"
+                >
                   <i className="bi bi-exclamation-triangle-fill me-2"></i>
                   {loginError}
-                  <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close" onClick={() => setLoginError('')}></button>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setLoginError("")}
+                  ></button>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} noValidate>
-                <div className="mb-4">
-                  <label htmlFor="email" className="form-label">
+                <div className="mb-3 text-start">
+                  <label htmlFor="email" className="form-label fw-semibold">
                     <i className="bi bi-envelope-fill me-2"></i>อีเมล
                   </label>
                   <input
                     type="email"
-                    className={`form-control form-control-lg ${errors.email ? 'is-invalid' : ''}`}
+                    className={`form-control ${
+                      errors.email ? "is-invalid" : ""
+                    }`}
                     id="email"
                     placeholder="example@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
-                  {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+                  {errors.email && (
+                    <div className="invalid-feedback">{errors.email}</div>
+                  )}
                 </div>
 
-                <div className="mb-4">
-                  <label htmlFor="password" className="form-label">
+                <div className="mb-3 text-start">
+                  <label htmlFor="password" className="form-label fw-semibold">
                     <i className="bi bi-lock-fill me-2"></i>รหัสผ่าน
                   </label>
                   <div className="input-group">
                     <input
                       type={showPassword ? "text" : "password"}
-                      className={`form-control form-control-lg ${errors.password ? 'is-invalid' : ''}`}
+                      className={`form-control ${
+                        errors.password ? "is-invalid" : ""
+                      }`}
                       id="password"
                       placeholder="กรอกรหัสผ่าน"
                       value={password}
@@ -118,28 +146,30 @@ const LoginPage = () => {
                       type="button"
                       onClick={toggleShowPassword}
                     >
-                      <i className={`bi ${showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
+                      <i
+                        className={`bi ${
+                          showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
+                        }`}
+                      ></i>
                     </button>
-                    {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                   </div>
-                </div>
-
-                <div className="d-flex justify-content-between mb-4">
-                  <div className="form-check">
-                    <input className="form-check-input" type="checkbox" id="rememberMe" />
-                    <label className="form-check-label" htmlFor="rememberMe">จดจำฉัน</label>
-                  </div>
-                  <a href="#" className="text-decoration-none">ลืมรหัสผ่าน?</a>
+                  {errors.password && (
+                    <div className="invalid-feedback">{errors.password}</div>
+                  )}
                 </div>
 
                 <button
                   type="submit"
-                  className="btn btn-primary btn-lg w-100 mb-3"
+                  className="btn btn-primary w-100 mb-3"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       กำลังเข้าสู่ระบบ...
                     </>
                   ) : (
@@ -150,28 +180,43 @@ const LoginPage = () => {
                   )}
                 </button>
 
-                <div className="text-center mt-3">
-                  <p>ยังไม่มีบัญชี? <a href="/register" className="text-decoration-none">สมัครสมาชิก</a></p>
-                </div>
+                <p className="text-center">
+                  ยังไม่มีบัญชี? <a href="/register">สมัครสมาชิก</a>
+                </p>
               </form>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Success Toast */}
-      <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 11 }}>
-        <div id="successToast" className="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-          <div className="d-flex">
-            <div className="toast-body">
-              <i className="bi bi-check-circle-fill me-2"></i>
-              เข้าสู่ระบบสำเร็จ! กำลังนำคุณไปยังหน้าหลัก...
+      {/* Toast */}
+      {showToast && (
+        <div
+          className="position-fixed bottom-0 end-0 p-3"
+          style={{ zIndex: 11 }}
+        >
+          <div
+            className="toast show align-items-center text-white bg-success border-0"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+          >
+            <div className="d-flex">
+              <div className="toast-body">
+                <i className="bi bi-check-circle-fill me-2"></i>
+                เข้าสู่ระบบสำเร็จ! กำลังนำคุณไปยังหน้าหลัก...
+              </div>
+              <button
+                type="button"
+                className="btn-close btn-close-white me-2 m-auto"
+                aria-label="Close"
+                onClick={() => setShowToast(false)}
+              ></button>
             </div>
-            <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

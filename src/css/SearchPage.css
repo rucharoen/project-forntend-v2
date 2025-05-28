@@ -1,0 +1,62 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}/* สีพื้นหลังกล่องรูปภาพ */
+.room-left {
+  background-color: #cff4ff;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+/* กล่องรายละเอียดห้อง */
+.room-right {
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* กล่องหัวข้อรายละเอียด */
+.room-detail-title {
+  font-size: 1.1em;
+  background: #cff4ff;
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #000;
+  border-radius: 4px;
+}
+
+/* กล่องแต่ละตัวเลือก */
+.card-option {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+/* ปุ่มจอง */
+.btn-book {
+  background-color: #ff6f00;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+.btn-book:hover {
+  background-color: #e65c00;
+}
+
+.room-title {
+  background-color: #cff4ff;
+  text-align: center;
+  margin-top: 0px;
+  margin-bottom: 10px;
+  padding: 10px 0;
+  border-radius: 8px;
+
+}
