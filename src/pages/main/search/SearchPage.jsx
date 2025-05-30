@@ -13,6 +13,7 @@ import TypeService from "../../../services/api/accommodation/type.service";
 import GetRoomAvailability from "../../../components/common/GetRoomAvailability";
 import "../../../css/SearchPage.css";
 
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const defaultFilters = {
@@ -41,6 +42,9 @@ const SearchPage = () => {
   const [availabilityData, setAvailabilityData] = useState({});
   const [filters, setFilters] = useState(defaultFilters);
 
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+
   useEffect(() => {
     document.title = `Barali Beach Resort`;
     TypeService.getAll().then((res) => setTypes(res?.data || []));
@@ -49,7 +53,12 @@ const SearchPage = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     const res = destination
-      ? await AccommodationService.getSearch(destination, checkIn, checkOut, guests)
+      ? await AccommodationService.getSearch(
+          destination,
+          checkIn,
+          checkOut,
+          guests
+        )
       : await AccommodationService.getAll();
     const results = res?.data || [];
     setOriginalResults(results);
@@ -68,7 +77,8 @@ const SearchPage = () => {
   }, [checkInDate, checkOutDate]);
 
   useEffect(() => {
-    const { priceRange, breakfast, freeCancel, highRating, selectedTypes } = filters;
+    const { priceRange, breakfast, freeCancel, highRating, selectedTypes } =
+      filters;
     setFilteredResults(
       originalResults.filter((acc) => {
         const price = acc.price_per_night || 0;
@@ -117,125 +127,162 @@ const SearchPage = () => {
     [filteredResults, matchesSearchTerm]
   );
 
+  const openImageModal = (acc) => {
+    const images = [
+      acc.image_name
+        ? `${BASE_URL}/uploads/accommodations/${acc.image_name}`
+        : "https://picsum.photos/id/57/400/300",
+      "https://picsum.photos/id/58/400/300",
+      "https://picsum.photos/id/59/400/300",
+    ];
+    setModalImages(images);
+    setShowImageModal(true);
+  };
+
   return (
-    <div className="container my-4">
+    <div className="search-page">
       <SearchBox resetFilter={resetFilters} />
 
-      <div className="text-end text-secondary mb-3">
-        พบ {visibleResults.length} รายการ
-      </div>
-
-      <div className="row gx-4">
-        {visibleResults.map((acc) => (
-          <div className="col-12 mb-4" key={acc.id}>
-            <div className="card-custom p-3 shadow-sm">
-              <div className="row">
-                <div className="col-md-4 p-3 room-left">
-                  <h5 className="fw-bold text-dark mb-3">{acc.name}</h5>
-                  <img
-                    src={
-                      acc.image_name
-                        ? `${BASE_URL}/uploads/accommodations/${acc.image_name}`
-                        : "https://picsum.photos/id/57/400/300"
-                    }
-                    className="img-fluid rounded mb-2 room-main-img"
-                    alt={acc.name}
-                  />
-                  <div className="row g-2 mb-2">
-                    {[102, 103].map((id, i) => (
-                      <img
-                        key={i}
-                        src="https://picsum.photos/id/57/400/300"
-                        alt=""
-                        className="img-fluid rounded col-6"
-                      />
-                    ))}
+      <div className="result-count">พบ {visibleResults.length} รายการ</div>
+      <div className="room-box">
+        <div className="room-grid">
+          {visibleResults.map((acc) => (
+            <div className="room-card" key={acc.id}>
+              <div className="room-left">
+                <h5 className="room-name">{acc.name}</h5>
+                <img
+                  src={
+                    acc.image_name
+                      ? `${BASE_URL}/uploads/accommodations/${acc.image_name}`
+                      : "https://picsum.photos/id/57/400/300"
+                  }
+                  className="room-main-img"
+                  alt={acc.name}
+                />
+                <div className="room-sub-images">
+                  {[102, 103].map((id, i) => (
+                    <img
+                      key={i}
+                      src={`https://picsum.photos/id/${id}/400/300`}
+                      alt=""
+                      className="room-sub-img"
+                    />
+                  ))}
+                </div>
+                <div className="room-meta">
+                  <div>
+                    <i className="bi bi-tv me-2"></i>
+                    {acc.bed_type || "เตียงแฝด หรือ เตียงใหญ่"}
                   </div>
-                  <div className="text-muted small mb-1">
-                    <i className="bi bi-tv me-2"></i>{acc.bed_type || "เตียงแฝด หรือ เตียงใหญ่"}
-                  </div>
-                  <div className="text-muted small mb-1">
-                    <i className="bi bi-aspect-ratio me-2"></i>{acc.room_size || "47 ตร.ม. 50.59 ตร.ฟุต"}
-                  </div>
-                  <div className="mt-2">
-                    <a
-                      href="#"
-                      className="text-decoration-underline text-orange room-detail-link"
-                    >
-                      คลิกดูรายละเอียดห้องและรูปเพิ่มเติม
-                    </a>
+                  <div>
+                    <i className="bi bi-aspect-ratio me-2"></i>
+                    {acc.room_size || "47 ตร.ม. 50.59 ตร.ฟุต"}
                   </div>
                 </div>
-
-                <div className="col-md-8 p-3 room-right">
-                  <div className="room-title">
-                    รายละเอียดห้องพัก
-                  </div>
-
-                  {[1, 2].map((option, idx) => {
-                    const isDiscounted = idx === 0;
-                    const finalPrice = isDiscounted
-                      ? getDiscountedPrice(acc)
-                      : acc.price_per_night;
-
-                    return (
-                      <div className="card-option mb-3 p-3 shadow-sm" key={idx}>
-                        <div className="row">
-                          <div className="col-md-7">
-                            <ul className="list-unstyled mb-0 amenities-list">
-                              {(acc.amenities ?? "")
-                                .split(",")
-                                .filter(Boolean)
-                                .map((item, index) => (
-                                  <li key={index}>
-                                    <i className="bi bi-check-circle-fill me-2"></i>
-                                    {item.trim()}
-                                  </li>
-                                ))}
-                            </ul>
-                          </div>
-                          <div className="col-md-5 text-end d-flex flex-column justify-content-between">
-                            <div>
-                              {isDiscounted && (
-                                <div className="text-danger fw-bold">ประหยัด {acc.discount}%</div>
-                              )}
-                              <div className="text-warning mb-2">
-                                {isDiscounted ? "★★★★★" : "★★★★☆"} <small>({acc.rating})</small>
-                              </div>
-                              {isDiscounted && (
-                                <div className="text-decoration-line-through text-muted">
-                                  {acc.price_per_night.toLocaleString()} บาท
-                                </div>
-                              )}
-                              <h4 className={isDiscounted ? "text-success" : "text-dark"}>
-                                {finalPrice.toLocaleString()} บาท/คืน
-                              </h4>
-                              <div className="text-muted price-note">
-                                รวมภาษีและค่าธรรมเนียม
-                              </div>
-                            </div>
-                            <button
-                              onClick={() =>
-                                navigate({
-                                  pathname: "/book",
-                                  search: createSearchParams({ id: acc.id, checkIn, checkOut }).toString(),
-                                })
-                              }
-                              className="btn btn-book mt-2 rounded-pill"
-                            >
-                              จองเลยตอนนี้
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="room-detail-link-wrapper">
+                  <button
+                    className="room-detail-link"
+                    onClick={() => openImageModal(acc)}
+                  >
+                    คลิกดูรายละเอียดห้องและรูปเพิ่มเติม
+                  </button>
                 </div>
               </div>
+
+              <div className="room-right">
+                <div className="room-title">รายละเอียดห้องพัก</div>
+                {[1, 2].map((option, idx) => {
+                  const isDiscounted = idx === 0;
+                  const finalPrice = isDiscounted
+                    ? getDiscountedPrice(acc)
+                    : acc.price_per_night;
+
+                  return (
+                    <div className="room-option" key={idx}>
+                      <div className="room-amenities">
+                        <ul className="amenities-list">
+                          {(acc.amenities ?? "")
+                            .split(",")
+                            .filter(Boolean)
+                            .map((item, index) => (
+                              <li key={index}>{item.trim()}</li>
+                            ))}
+                        </ul>
+                      </div>
+
+                      <hr className="vertical-divider"></hr>
+
+                      <div className="room-pricing">
+                        {isDiscounted && (
+                          <div className="discount">
+                            <span className="text-gray">ประหยัด </span>
+                            <span className="text-red">{acc.discount}%</span>
+                          </div>
+                        )}
+                        <div className="rating">
+                          {isDiscounted ? "★★★★★" : "★★★★☆"}{" "}
+                          <small>({acc.rating})</small>
+                        </div>
+                        {isDiscounted && (
+                          <div className="price-strike">
+                            {acc.price_per_night.toLocaleString()} บาท
+                          </div>
+                        )}
+                        <div
+                          className={`price ${
+                            isDiscounted ? "text-success" : "text-dark"
+                          }`}
+                        >
+                          {finalPrice.toLocaleString()} TBH/คืน
+                        </div>
+                        <div className="price-note">รวมภาษีและค่าธรรมเนียม</div>
+                        <button
+                          onClick={() =>
+                            navigate({
+                              pathname: "/book",
+                              search: createSearchParams({
+                                id: acc.id,
+                                checkIn,
+                                checkOut,
+                              }).toString(),
+                            })
+                          }
+                          className="btn-book"
+                        >
+                          จองเลยตอนนี้
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <hr />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Modal Popup */}
+      {showImageModal && (
+        <div className="image-modal" onClick={() => setShowImageModal(false)}>
+          <div
+            className="image-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-button"
+              onClick={() => setShowImageModal(false)}
+            >
+              &times;
+            </button>
+            <div className="modal-images">
+              {modalImages.map((src, i) => (
+                <img key={i} src={src} alt={`รูป ${i + 1}`} />
+              ))}
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

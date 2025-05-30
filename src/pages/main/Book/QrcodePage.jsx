@@ -19,9 +19,6 @@ const QrcodePage = () => {
         setShowModal(false);
         navigate("/receipt", { state: { paymentMethod } });
       }, 4000);
-
-      
-
     }, 2000);
 
     let redirectTimer;

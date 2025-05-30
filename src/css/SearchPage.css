@@ -1,62 +1,344 @@
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;600;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}/* สีพื้นหลังกล่องรูปภาพ */
-.room-left {
-  background-color: #cff4ff;
-  border-radius: 8px;
-  padding: 1rem;
+  font-family: 'Bai Jamjuree', sans-serif;
 }
 
-/* กล่องรายละเอียดห้อง */
-.room-right {
-  border-radius: 8px;
-  padding: 1rem;
+.search-page {
+  padding: 20px;
+}
+
+.result-count {
+  font-size: 18px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 110px;
+  color: #666;
+
+}
+
+.room-grid {
   display: flex;
   flex-direction: column;
+  gap: 30px;
 }
 
-/* กล่องหัวข้อรายละเอียด */
-.room-detail-title {
-  font-size: 1.1em;
-  background: #cff4ff;
-  padding: 0.5rem;
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #000;
-  border-radius: 4px;
+.room-box {
+  display: flex;
+  justify-content: center;
 }
 
-/* กล่องแต่ละตัวเลือก */
-.card-option {
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  border-radius: 6px;
+.room-card {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  display: 10px;
+  overflow: hidden;
   background-color: #fff;
+  flex-wrap: nowrap;
+  width: 1300px;
+  height: 600px;
+  
 }
 
-/* ปุ่มจอง */
-.btn-book {
-  background-color: #ff6f00;
-  color: white;
-  font-weight: bold;
+.room-left {
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(207, 244, 255, 1);
+  padding: 16px;
+  border-radius: 25px;
+  width: 450px;
+  height: 580px;
+  box-shadow: 0px 4px 5px 0px #bbbbbb; /* เงาสีดำ */
+
+}
+
+
+
+.room-name {
+  margin-left: 10px;
+  font-size: 32px;
+  margin-bottom: 7px;
+  font-weight: 400;
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.room-main-img {
+  width: 400px;
+  height: 260px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  object-fit: cover;
+}
+
+.room-sub-images {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+  
+}
+
+.room-sub-img {
+  width: 197px;
+  height: 130px;
+  border-radius: 6px;
+}
+
+.room-meta {
+  font-size: 17px;
+  color: #000000;
+  width: 100%;
+  margin-left: 23px;
+  gap: 10px;
+}
+
+.room-meta i {
+  color: rgba(123, 123, 123, 1);
+}
+
+.room-detail-link-wrapper {
+  margin-top: 5px;
+  margin-left: -80px;
+  text-align: center;
+  width: 100%;
+  font-weight: 500;
+  
+}
+
+.room-detail-link {
+  color: rgba(255, 110, 0, 1);
+  background-color: rgba(207, 244, 255, 1);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 21px;
   border: none;
-  padding: 0.5rem 1rem;
 }
 
-.btn-book:hover {
-  background-color: #e65c00;
+.room-right {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .room-title {
-  background-color: #cff4ff;
+  background-color: rgba(207, 244, 255, 1);
   text-align: center;
-  margin-top: 0px;
-  margin-bottom: 10px;
-  padding: 10px 0;
+  padding: 12px;
   border-radius: 8px;
+  font-size: 22px;
+  font-weight: 400;
+  width: 800px;
+}
 
+.room-option {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 16px;
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 10px;
+  border: 2px solid rgba(164, 164, 164, 1);
+  max-height: 250px;
+  min-height: 250px;
+  width: 800px;
+  align-items: stretch;
+}
+
+.vertical-divider {
+  
+  width: 2px; 
+  background-color: rgb(123, 123, 123); 
+  border: none;
+  margin: 0 -5px; 
+}
+
+.room-amenities {
+  margin-left: 180px;
+}
+
+.amenities-list {
+  margin-left: -180px;
+}
+
+.room-option > div {
+  flex: 1 1 200px;
+  min-width: 180px;
+}
+
+
+.amenities-list li {
+  margin-bottom: 4px;
+  line-height: 1.5;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.room-pricing {
+  text-align: right;
+  
+
+}
+
+.discount {
+  margin-right: 155px;
+}
+
+.text-gray {
+  color: rgba(121, 121, 121, 1);
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.text-red {
+  color: red;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+
+.rating {
+  color: #ff9800;
+  font-size: 16px;
+  margin-bottom: 6px;
+  margin-right: 185px;
+}
+
+.price-strike {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.price {
+  font-size: 32px;
+  font-weight: 600;
+  
+}
+
+.price-note {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.btn-book {
+  
+  background-color: rgba(114, 181, 77, 1);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 9px 0;
+  border-radius: 6px;
+  width: 150px;
+  font-size: 20px;
+  transition: background 0.3s ease;
+}
+
+.btn-book:hover {
+  background-color: rgb(96, 160, 61);
+}
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.image-modal-content {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  max-width: 90%;
+  max-height: 80%;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-images {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.modal-images img {
+  max-width: 250px;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+}
+
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 992px) {
+  .room-card {
+    flex-direction: column;
+  }
+
+  .room-sub-images {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .room-sub-img {
+    width: 48%;
+  }
+
+  .room-title {
+    font-size: 16px;
+  }
+
+  .btn-book {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .room-name {
+    font-size: 18px;
+  }
+
+  .price {
+    font-size: 18px;
+  }
+
+  .room-sub-img {
+    width: 100%;
+  }
+
+  .room-title {
+    font-size: 15px;
+    padding: 8px;
+  }
 }
