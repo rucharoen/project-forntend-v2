@@ -28,7 +28,7 @@ const SearchBox = ({ resetFilter }) => {
   const [guestPopupVisible, setGuestPopupVisible] = useState(false);
   const [guestPopupPos, setGuestPopupPos] = useState({ top: 0, left: 0 });
   const [roomsCount, setRoomsCount] = useState(1);
-  const [adultsCount, setAdultsCount] = useState(2);
+  const [adultsCount, setAdultsCount] = useState(1);
   const [childrenCount, setChildrenCount] = useState(0);
 
   const [calendarPos, setCalendarPos] = useState({ top: 0, left: 0 });

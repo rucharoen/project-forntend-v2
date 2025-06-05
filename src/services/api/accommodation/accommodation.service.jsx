@@ -16,7 +16,7 @@ const getAll = async () => {
 };
 
 const getSearch = async (destination, checkIn, checkOut, guests) => {
-    // console.log("getSearch", destination, checkIn, checkOut, guests);
+    console.log("getSearch", destination, checkIn, checkOut, guests);
     return await axios.get(`${BASE_URL}/api/accommodation/search`, {
         params: {
             destination,
@@ -24,18 +24,23 @@ const getSearch = async (destination, checkIn, checkOut, guests) => {
             checkOut,
             guests
         }
+        
     });
+    
 }
 
 const getAvailability = (checkInDate, checkOutDate) => {
+  console.log("📅 Sending check-in/out:", checkInDate, checkOutDate);
+
   return axios.get(`${BASE_URL}/api/accommodation/availableroom`, {
     params: {
       check_in: checkInDate,
       check_out: checkOutDate
     }
   });
-}
+};
 
+  
 const createBooking = (checkInDate, checkOutDate) => {
   return axios.post(`${BASE_URL}/api/booking`, {
     checkInDate,

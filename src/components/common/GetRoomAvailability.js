@@ -28,8 +28,9 @@ const GetRooomAvailability = async (checkInDate, checkOutDate) => {
     });
 
     return availabilityMap; // return ค่าออกไปให้ใช้
-  } catch (err) {
-    console.error('Error fetching availability:', err);
+  } catch (error) {
+    console.error("❌ Error fetching availability:", error.message);
+  console.error("📄 Full error:", error.response?.data || error);
     return {}; // กรณี error ก็ return empty
   }
 };

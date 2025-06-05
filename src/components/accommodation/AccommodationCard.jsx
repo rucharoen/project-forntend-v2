@@ -1,15 +1,41 @@
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const AccommodationCard = ({ accommodation }) => {
-  const images = accommodation.images || []; // สมมติ accommodation.images เป็น array ของชื่อรูป
-  const imagesToShow = images.slice(0, 3); // แสดงแค่ 3 รูปแรก
-
+const AccommodationCard = ({
+  accommodation,
+  promotions = [],
+  checkIn,
+  checkOut,
+}) => {
+  const navigate = useNavigate();
+  const images = accommodation.images || [];
+  const imagesToShow = images.slice(0, 3);
   const originalPrice = accommodation.price_per_night;
-  const discountPercent = accommodation.discount;
 
+  const handleBookingClick = () => {
+    if (!checkIn || !checkOut) {
+      const searchBox = document.getElementById("searchbox");
+      if (searchBox) {
+        searchBox.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    const params = new URLSearchParams({
+      destination: accommodation?.type?.name || "",
+      checkIn,
+      checkOut,
+    });
+    navigate(`/search-results?${params.toString()}`);
+  };
+
+  const matchedPromotion = promotions.find(
+    (promo) => promo?.type?.name === accommodation?.type?.name
+  );
+
+  const discountPercent = Number(matchedPromotion?.percent) || 0;
   const hasDiscount = originalPrice && discountPercent;
   const discountedPrice = hasDiscount
     ? Math.round(originalPrice * (1 - discountPercent / 100))
@@ -20,7 +46,7 @@ const AccommodationCard = ({ accommodation }) => {
       xs={12}
       sm={6}
       md={4}
-      className="d-flex justify-content-center mb-4 mt-5 g-1"
+      className="d-flex justify-content-center mb-4 mt-4 g-1"
     >
       <div
         className="card h-100 border-0 d-flex flex-column position-relative"
@@ -31,20 +57,20 @@ const AccommodationCard = ({ accommodation }) => {
           height: "521px",
         }}
       >
-        {/* ป้ายโปรโมชั่น */}
-        <div
-          className="position-absolute bg-danger text-white px-3 py-1"
-          style={{
-            borderTopLeftRadius: "0.4rem",
-            fontSize: "0.9rem",
-            fontWeight: "500",
-            zIndex: 10,
-          }}
-        >
-          โปรโมชั่น
-        </div>
+        {discountPercent > 0 && (
+          <div
+            className="position-absolute bg-danger text-white px-3 py-1"
+            style={{
+              borderTopLeftRadius: "0.4rem",
+              fontSize: "20px",
+              fontWeight: "700",
+              zIndex: 10,
+            }}
+          >
+            โปรโมชั่น
+          </div>
+        )}
 
-        {/* แสดงรูปภาพ 3 รูป */}
         <div
           className="d-flex"
           style={{
@@ -87,31 +113,29 @@ const AccommodationCard = ({ accommodation }) => {
           )}
         </div>
 
-        {/* เนื้อหา */}
         <div className="card-body d-flex flex-column">
           <h6 className="card-title fw-bold mb-2" style={{ fontSize: "2rem" }}>
             {accommodation.name}
           </h6>
 
           <p
-            className="text-warning mb-1"
+            className=" mb-1"
             style={{
-              fontSize: "1.5rem",
+              fontSize: "24px",
               fontWeight: "500",
               color: "rgba(255, 110, 0, 1)",
             }}
           >
-            {accommodation.promotion_detail || "โปรโมชั่นพิเศษ"}
+            {matchedPromotion?.condition || "โปรโมชั่นพิเศษ"}
           </p>
           <p className="text-muted mb-1" style={{ fontSize: "0.95rem" }}>
-            {accommodation.promotion_date || "1 เม.ย. - 31 ส.ค. 2568"}
+            {matchedPromotion?.period || "1 เม.ย. - 31 ส.ค. 2568"}
           </p>
           <p className="text-muted mb-2" style={{ fontSize: "0.95rem" }}>
             รวมอาหารเช้า
           </p>
         </div>
 
-        {/* ปุ่มด้านล่างเต็มความกว้าง */}
         <div className="d-flex w-100">
           <span
             className="fw-bold text-center"
@@ -126,11 +150,11 @@ const AccommodationCard = ({ accommodation }) => {
               whiteSpace: "nowrap",
             }}
           >
-            ประหยัด {discountPercent}%
+            {discountPercent > 0 ? `ประหยัด ${discountPercent}%` : "ราคาปกติ"}
           </span>
 
-          <a
-            href="http://localhost:1111/search-results?destination=&guests=1&checkIn=2025-05-17&checkOut=2025-05-18"
+          <button
+            // onClick={handleBookingClick}
             className="fw-bold text-white text-decoration-none"
             style={{
               backgroundColor: "rgba(0, 196, 255, 1)",
@@ -139,13 +163,13 @@ const AccommodationCard = ({ accommodation }) => {
               borderRadius: "0 0 0.375rem 0",
               fontSize: "1.05rem",
               whiteSpace: "nowrap",
-              display: "inline-block",
               textAlign: "center",
               padding: "0.5rem 1rem",
+              border: "none",
             }}
           >
             จองเลยตอนนี้
-          </a>
+          </button>
         </div>
       </div>
     </Col>

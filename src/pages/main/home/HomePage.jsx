@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import Popular from "../../../components/accommodation/Popular";
+import Promotion from "../../../components/accommodation/Promotion";
 import Accommodation from "../../../components/accommodation/Accommodation";
 import Activity from "../../../components/activity/Activity";
 import HeroImage from "../../../components/heroImage/HeroImage";
 import SearchBox from "../../../components/search/SearchBox";
-import AcceptanceSymbol from "../../../components/accommodation/AcceptanceSymbol"
+import AcceptanceSymbol from "../../../components/accommodation/AcceptanceSymbol";
 import "../../../css/HomeSearch.css";
 
 const HomePage = () => {
@@ -30,8 +30,8 @@ const HomePage = () => {
             <span
               className="border-bottom border-3 border-primary-custom"
               style={{ display: "inline-block" }}
-            >โปรโมชัน
-             
+            >
+              โปรโมชัน
             </span>
           </h3>
 
@@ -39,11 +39,11 @@ const HomePage = () => {
 
           {/* เส้นแบ่งล่างสุด */}
           <div
-        style={{
-          borderBottom: "3px solid rgba(186, 186, 186, 1)",
-          marginTop: "2rem",
-        }}
-      ></div>
+            style={{
+              borderBottom: "3px solid rgba(186, 186, 186, 1)",
+              marginTop: "2rem",
+            }}
+          ></div>
         </div>
       </section>
 
@@ -52,12 +52,19 @@ const HomePage = () => {
         id="PopularSection"
         style={{ marginTop: isDesktop ? "2rem" : "2rem" }}
       >
-        <h3 className="fw-bold">
-          <span className="border-bottom border-3 border-primary">
+        <h3 className="fw-bold text-center mb-4">
+          <span className="border-bottom border-3 border-primary-custom">
             ประเภทห้องพัก
           </span>
         </h3>
-        <Popular />
+        <Promotion />
+
+        <div
+          style={{
+            borderBottom: "3px solid rgba(186, 186, 186, 1)",
+            marginTop: "2rem",
+          }}
+        ></div>
       </section>
 
       <section className="container my-5 text-center" id="ActivitySection">
@@ -82,8 +89,8 @@ const HomePage = () => {
             >
               รางวัลและการรับรองคุณภาพ
             </span>
-          </h3>   
-          <AcceptanceSymbol/>  
+          </h3>
+          <AcceptanceSymbol />
         </div>
       </section>
     </>

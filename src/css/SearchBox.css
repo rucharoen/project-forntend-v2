@@ -1,6 +1,6 @@
 .searchbox-container {
   background: rgba(207, 244, 255, 1);
-  padding: 0.7rem ;
+  padding: 0.7rem;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin-block: 2rem;
@@ -19,7 +19,6 @@
   width: 100%;
   flex-wrap: nowrap;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
 }
 
 .searchbox-col {
@@ -45,42 +44,41 @@
   flex: 0 0 25%;
   min-width: 180px;
   color: rgba(121, 121, 121, 1);
-  
 }
 
 .select-input.has-icon {
-min-height: 65px;
+  min-height: 65px;
+  padding-left: 50px;
 }
 
 .searchbox-col.button {
   flex: 0 0 10%;
   min-width: 119px;
   display: flex;
-  align-items: center;    
+  align-items: center;
   justify-content: center;
-  padding-top: 0;    
-  height: 100%;     
+  padding-top: 0;
+  height: 100%;
   box-sizing: border-box;
 }
-
 
 .select-input {
   padding: 0.75rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(121, 121, 121, 1);
   border-radius: 8px;
   width: 100%;
   box-sizing: border-box;
   min-height: 48px;
   min-width: 294.4px;
-  appearance: none;        /* สำหรับ Firefox */
+  appearance: none; /* สำหรับ Firefox */
   -webkit-appearance: none; /* สำหรับ Safari และ Chrome */
-  -moz-appearance: none;   /* สำหรับ Firefox */
-  background-image: none;  /* ลบไอคอนออก */
+  -moz-appearance: none; /* สำหรับ Firefox */
+  background-image: none; /* ลบไอคอนออก */
 }
 
 .calendar-text {
-  margin-left: 8px; 
+  margin-left: 8px;
   font-size: 1.375rem;
   color: rgba(121, 121, 121, 1);
 }
@@ -94,12 +92,12 @@ min-height: 65px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  width: 100%;     
-  height: 65px;   
+  width: 100%;
+  height: 65px;
   box-sizing: border-box;
-  margin: 0;     
-  line-height: normal; 
-  display: flex;   
+  margin: 0;
+  line-height: normal;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
@@ -115,7 +113,7 @@ min-height: 65px;
   align-items: center;
   gap: 8px;
   background: #fff;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(121, 121, 121, 1);
   border-radius: 8px;
   padding: 6px 10px;
   width: 100%;
@@ -123,7 +121,15 @@ min-height: 65px;
   box-sizing: border-box;
   min-height: 65px;
   min-width: 0;
-  
+}
+
+.agoda-date-container hr {
+  margin: 0;
+  padding: 0;
+  width: 2px;
+  height: 50px;
+  background-color: black;
+  border: none;
 }
 
 .agoda-date-button {
@@ -148,17 +154,22 @@ min-height: 65px;
   left: 0;
   z-index: 999;
   background: white;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(121, 121, 121, 1);
   border-radius: 12px;
   padding: 16px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   display: flex;
   justify-content: center;
-  
-  
 }
 
-
+/* hr {
+  margin: 0;
+  padding: 0;
+  width: 1px; 
+  height: 50px;
+  background-color: black; 
+  border: none;
+} */
 
 .calendar-wrapper {
   display: flex;
@@ -166,7 +177,6 @@ min-height: 65px;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  
 }
 
 .calendar-wrapper > div {
@@ -228,7 +238,7 @@ min-height: 65px;
   padding: 0 0.75rem;
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(121, 121, 121, 1);
   border-radius: 8px;
   min-width: 180px;
   font-size: 1.375rem;
@@ -240,14 +250,13 @@ min-height: 65px;
   top: 100%;
   left: 0;
   background: white;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(121, 121, 121, 1);
   border-radius: 12px;
   padding: 1rem;
   margin-top: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 999;
-   min-width: 240px;
-  
+  min-width: 240px;
 }
 
 .guest-row {
@@ -276,14 +285,13 @@ min-height: 65px;
   position: relative;
   display: flex;
   align-items: center;
-  
 }
 
 .select-icon {
   position: absolute;
-  left: 12px;
+  margin-left: 12px;
   pointer-events: none;
-  color:rgba(121, 121, 121, 1);
+  color: rgba(121, 121, 121, 1);
 }
 
 /* ควรใช้ที่ select แทน */
@@ -292,9 +300,7 @@ min-height: 65px;
   color: rgba(121, 121, 121, 1);
 }
 
-.select-input.has-icon {
-  padding-left: 40px; /* เว้นที่ให้ icon */
-}
+
 
 .date-error {
   color: red;
@@ -306,7 +312,6 @@ min-height: 65px;
   border: 2px solid red;
 }
 
-
 /* Responsive (หน้าจอเล็กให้เลื่อนได้แนวนอน ไม่ตกบรรทัด) */
 @media (max-width: 812px) {
   .searchbox-row {
@@ -315,9 +320,9 @@ min-height: 65px;
   }
 
   .searchbox-col {
-    flex: 0 0 100%;     /* ให้ความกว้างเต็ม */
+    flex: 0 0 100%; /* ให้ความกว้างเต็ม */
     width: 100%;
-    min-width: unset;   /* ยกเลิก min-width เดิม */
+    min-width: unset; /* ยกเลิก min-width เดิม */
     align-items: stretch;
   }
 

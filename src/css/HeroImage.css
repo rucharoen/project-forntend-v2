@@ -1,4 +1,4 @@
-/* HeroImage.css - Luxury Minimalist Style */
+/* 
 .hero-carousel-container {
   position: relative;
   overflow: hidden;
@@ -184,7 +184,7 @@
   box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
 }
 
-/* ปรับแต่ง indicators */
+
 .carousel-indicators {
   bottom: 20px;
 }
@@ -205,7 +205,7 @@
   background-color: #fff;
 }
 
-/* ปรับแต่งสำหรับมือถือ */
+
 @media (max-width: 768px) {
   .caption-container {
     padding: 15px;
@@ -238,10 +238,20 @@
   }
 
   .caption-description {
-    display: none; /* ซ่อนคำอธิบายในหน้าจอขนาดเล็ก */
+    display: none; 
   }
 
   .enhanced-caption {
     bottom: 20px;
   }
+} */
+
+.custom-heading-h1 {
+  font-size: 52px;
+  font-weight: 700;
+}
+
+.custom-heading-h3 {
+  font-size: 42px;
+  font-weight: 700;
 }

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../../../services/auth/auth.service";
 
-
 const LoginPage = ({ closeLogin }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -69,10 +68,10 @@ const LoginPage = ({ closeLogin }) => {
         className="modal fade show d-block"
         tabIndex="-1"
         role="dialog"
-        style={{ background: "rgba(0,0,0,0.3)", minHeight: "100vh" }}
+        style={{ background: "rgba(112, 112, 112, 0.3)", minHeight: "100vh" }}
       >
-        <div className="modal-dialog modal-dialog-centered" role="document">
-          <div className="modal-content border-0 rounded-3 p-4">
+        <div className="modal-dialog modal-dialog-centered" role="document" >
+          <div className="modal-content border-0 rounded-3 p-2 " >
             <button
               type="button"
               className="btn-close position-absolute end-0 m-3 z-3"
@@ -80,16 +79,33 @@ const LoginPage = ({ closeLogin }) => {
               aria-label="Close"
             ></button>
 
-            <div className="modal-body text-center">
+            <div
+              className="modal-body text-center"
+              style={{
+                padding: "2rem",
+                backgroundColor: "#ffffff",
+                borderRadius: "0.75rem",
+                
+                
+                lineHeight: "1.6",
+              }}
+            >
               <img
                 src="https://www.baraliresort.com/images/logo.png"
                 alt="logo"
-                width="113"
-                height="88"
+                width="113px"
+                height="88px"
                 className="mb-3"
               />
               <h5 className="fw-bold mb-3">เข้าสู่ระบบ</h5>
-              <p className="text-muted mb-4">กรุณากรอกข้อมูลเพื่อเข้าสู่ระบบ</p>
+              <p
+                className="mb-4"
+                style={{
+                  color: "rgba(91, 91, 91, 1)",
+                }}
+              >
+                กรุณากรอกข้อมูลเพื่อเข้าสู่ระบบ
+              </p>
 
               {loginError && (
                 <div
@@ -109,7 +125,7 @@ const LoginPage = ({ closeLogin }) => {
               <form onSubmit={handleSubmit} noValidate>
                 <div className="mb-3 text-start">
                   <label htmlFor="email" className="form-label fw-semibold">
-                    <i className="bi bi-envelope-fill me-2"></i>อีเมล
+                    ชื่อผู้ใช้
                   </label>
                   <input
                     type="email"
@@ -117,9 +133,11 @@ const LoginPage = ({ closeLogin }) => {
                       errors.email ? "is-invalid" : ""
                     }`}
                     id="email"
-                    placeholder="example@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                      border: "2px solid rgba(184, 179, 179, 1)",
+                    }}
                   />
                   {errors.email && (
                     <div className="invalid-feedback">{errors.email}</div>
@@ -128,7 +146,7 @@ const LoginPage = ({ closeLogin }) => {
 
                 <div className="mb-3 text-start">
                   <label htmlFor="password" className="form-label fw-semibold">
-                    <i className="bi bi-lock-fill me-2"></i>รหัสผ่าน
+                    รหัสผ่าน
                   </label>
                   <div className="input-group">
                     <input
@@ -137,14 +155,21 @@ const LoginPage = ({ closeLogin }) => {
                         errors.password ? "is-invalid" : ""
                       }`}
                       id="password"
-                      placeholder="กรอกรหัสผ่าน"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      style={{
+                        border: "2px solid rgba(184, 179, 179, 1)",
+                        borderRight: "none", // เพื่อไม่ชนกับปุ่มด้านขวา
+                      }}
                     />
                     <button
                       className="btn btn-outline-secondary"
                       type="button"
                       onClick={toggleShowPassword}
+                      style={{
+                        border: "2px solid rgba(184, 179, 179, 1)",
+                        borderLeft: "none", // ให้ติดกันกับ input
+                      }}
                     >
                       <i
                         className={`bi ${
@@ -154,13 +179,26 @@ const LoginPage = ({ closeLogin }) => {
                     </button>
                   </div>
                   {errors.password && (
-                    <div className="invalid-feedback">{errors.password}</div>
+                    <div className="invalid-feedback d-block">
+                      {errors.password}
+                    </div>
                   )}
                 </div>
 
                 <button
                   type="submit"
-                  className="btn btn-primary w-100 mb-3"
+                  className="w-100 mb-3"
+                  style={{
+                    backgroundColor: "rgba(0, 186, 242, 1)",
+                    borderColor: "rgba(0, 186, 242, 1)",
+                    color: "#fff",
+                    fontWeight: 400,
+                    fontSize: "1rem",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "0.375rem",
+                    border: "1px solid transparent",
+                    marginTop: "18px"
+                  }}
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -173,16 +211,9 @@ const LoginPage = ({ closeLogin }) => {
                       กำลังเข้าสู่ระบบ...
                     </>
                   ) : (
-                    <>
-                      <i className="bi bi-box-arrow-in-right me-2"></i>
-                      เข้าสู่ระบบ
-                    </>
+                    <>เข้าสู่ระบบ</>
                   )}
                 </button>
-
-                <p className="text-center">
-                  ยังไม่มีบัญชี? <a href="/register">สมัครสมาชิก</a>
-                </p>
               </form>
             </div>
           </div>

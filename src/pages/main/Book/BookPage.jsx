@@ -1,127 +1,120 @@
-import React, { useState } from "react";
-import "../../../css/Booking.css"; // แยก style ออกไว้ต่างหาก
+import React from "react";
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
+import FormatToBE from '../../../utils/FormatToBE';
+import AccommodationService from "../../../services/api/accommodation/accommodation.service";
 
-const BookingPage = () => {
-  const [paymentMethod, setPaymentMethod] = useState("promptpay");
-  const [agreeTerms, setAgreeTerms] = useState(false);
-  const [specialRequest, setSpecialRequest] = useState("");
+const BookPage = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [isCredit, setIsCredit] = React.useState(false);
+  const [user, setUser] = React.useState(null);
+  const [step, setStep] = React.useState(1);
 
-  const handleBooking = () => {
-    if (!agreeTerms) return;
-    // ทำ logic ต่อ เช่น: ส่งข้อมูลไป backend
-    console.log("จองสำเร็จ!");
+  const checkIn = searchParams.get('checkIn') || '';
+  const checkOut = searchParams.get('checkOut') || '';
+
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const createBooking = async () => {
+    try {
+      await AccommodationService.createBooking(checkIn, checkOut);
+      setStep(2);
+    } catch (error) {
+      console.error("Error creating booking:", error);
+    }
+  };
+
+  // ฟังก์ชันช่วย render ขั้นตอน
+  const renderStepIndicator = () => {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+        {[1, 2].map((num) => (
+          <div
+            key={num}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              lineHeight: '40px',
+              textAlign: 'center',
+              margin: '0 10px',
+              backgroundColor: step === num ? '#0d6efd' : '#ccc',
+              color: step === num ? 'white' : '#666',
+              fontWeight: 'bold',
+              userSelect: 'none',
+              boxShadow: step === num ? '0 0 8px rgba(13,110,253,0.7)' : 'none',
+            }}
+          >
+            {num}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="booking-step">
-      <div className="step-header-bar">
-      <div>ขั้นตอน:</div>
-        <div className="step-item active">
-          <div className="step-number">1</div>          
+    <div className="container mt-4">
+      {user && (
+        <div className="mb-3">
+          👋 สวัสดีคุณ <strong>{user.name} {user.lastname}</strong>
         </div>
-        <div className="step-item">
-          <div className="step-number">2</div>
-        </div>
-      </div>
+      )}
 
-      <div className="booking-container">
-        {/* ซ้าย */}
-        <div className="booking-left">
-          <div className="room-image">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3lLjtKxLKjJ3YNRphNTpVRQUcsOB-hNwwCg&s"
-              alt="Room"
-            />
-            
+      {/* แสดง Step Indicator */}
+      {renderStepIndicator()}
+
+      {step === 1 && (
+        <>
+          <div className="mb-2" style={{ color: '#888', fontSize: '1em' }}>
+            <span className="me-3">เช็คอิน: <b>{FormatToBE(checkIn) || 'ไม่ระบุ'}</b></span>
+            <span className="me-3">เช็คเอาท์: <b>{FormatToBE(checkOut) || 'ไม่ระบุ'}</b></span>
           </div>
 
-          <h3>เลือกวิธีการชำระเงิน</h3>
-          <div className="payment-method">
-            <label>
-              <input
-                type="radio"
-                name="payment"
-                value="promptpay"
-                checked={paymentMethod === "promptpay"}
-                onChange={() => setPaymentMethod("promptpay")}
-              />
-              <span className="method-option">พร้อมเพย์</span>
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="payment"
-                value="creditcard"
-                checked={paymentMethod === "creditcard"}
-                onChange={() => setPaymentMethod("creditcard")}
-              />
-              <span className="method-option">บัตรเครดิต</span>
-            </label>
-          </div>
+          <Button variant="primary" onClick={createBooking}>
+            Booking Now
+          </Button>
+        </>
+      )}
 
-          <div className="special-request">
-            <label>คำขอพิเศษ</label>
-            <textarea
-              value={specialRequest}
-              onChange={(e) => setSpecialRequest(e.target.value)}
-              placeholder="เช่น ประเภทเตียง หรือ สถานที่รับส่ง"
-            />
-            <p className="note">
-              * ไม่รับประกันคำขอพิเศษ
-              แต่ทีมของท่านจะได้รับการดูแลอย่างดีที่สุดตามที่เป็นไปได้
-            </p>
-          </div>
-        </div>
+      {step === 2 && (
+  <>
+    <h4>ขั้นตอนที่ 2: เลือกวิธีชำระเงิน</h4>
 
-        {/* ขวา */}
-        <div className="booking-right">
-          <h3>สรุปรายการจอง</h3>
-          <div className="hotel-name">บาราลี บีช รีสอร์ท แอนด์ สปา</div>
-          <div className="hotel-location">จังหวัดตราด ประเทศไทย</div>
-          <div className="review-stars">★★★★★</div>
+    <div className="mb-3 d-flex gap-3">
+      <Button
+        variant={isCredit ? 'outline-secondary' : 'primary'}
+        onClick={() => setIsCredit(false)}
+        style={{ flex: 1 }}
+      >
+        ชำระผ่าน QR Code
+      </Button>
 
-          <ul className="booking-details">
-            <li>1 คืน: 13 มิ.ย. 2025 - 14 มิ.ย. 2025</li>
-            <li>ชื่อผู้เข้าพัก: นายหงษ์หาย</li>
-            <li>อีเมล: thanongthoeyu@gmail.com</li>
-            <li>ห้อง: บีชฟรอนต์ วิลล่า</li>
-            <li>ราคา: ซัมเมอร์ดีล ลด 58%</li>
-            <li>
-              ผู้ใหญ่: 2 <a href="#">ดูรายละเอียด / แก้ไข</a>
-            </li>
-          </ul>
+      <Button
+        variant={isCredit ? 'primary' : 'outline-secondary'}
+        onClick={() => setIsCredit(true)}
+        style={{ flex: 1 }}
+      >
+        ชำระผ่านบัตรเครดิต
+      </Button>
+    </div>
 
-          <div className="total-summary">
-            <span>ยอดรวมสุทธิ</span>
-            <span className="price">7,140 บาท</span>
-            <div className="note">รวมภาษีและค่าธรรมเนียม</div>
-          </div>
+    <Button
+      variant="success"
+      onClick={() => navigate(isCredit ? '/credit-card' : '/qr-code')}
+    >
+      ดำเนินการชำระเงิน
+    </Button>
+  </>
+)}
 
-          <div className="terms-agree">
-            <label>
-              <input
-                type="checkbox"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-              />
-              ฉันได้อ่านและยอมรับ <a href="#">ข้อตกลงและเงื่อนไข</a>
-            </label>
-          </div>
-
-          <div className="action-buttons">
-            <button className="cancel">ยกเลิก</button>
-            <button
-              className="confirm"
-              onClick={handleBooking}
-              disabled={!agreeTerms}
-            >
-              ทำการจอง →
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
 
-export default BookingPage;
+export default BookPage;
