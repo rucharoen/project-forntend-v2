@@ -1,0 +1,23 @@
+/* CSS เพิ่มในไฟล์ของคุณ */
+.custom-modal-width {
+  max-width: 900px;
+  width: 90%;
+}
+
+.step-box {
+  width: 26px;
+  height: 27px;
+  border-radius: 3px;
+  line-height: 27px;
+  text-align: center;
+  margin: 0 8px;
+  background-color: rgba(217, 217, 217, 0.58);
+  color: #666;
+  font-weight: bold;
+  user-select: none;
+}
+.step-box.active {
+  background-color: #414141;
+  color: white;
+  box-shadow: 0 0 8px #414141;
+}

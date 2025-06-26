@@ -1,6 +1,7 @@
 import { Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../css/HeroImage.css"
+import "../../css/HeroImage.css";
+import hero from "../../upimg/hero.jpg";
 
 const HeroImage = () => {
   return (
@@ -20,7 +21,7 @@ const HeroImage = () => {
       </style>
 
       <img
-        src="https://scontent.fbkk5-4.fna.fbcdn.net/v/t1.15752-9/495267458_1845902902896226_4804704848285100621_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=0024fc&_nc_eui2=AeHX428zFt85XYu0ORyH6SCJbqYaY5i3H6NuphpjmLcfo8tEqk3iEX1D8386bN8BRwpQ4bLfUFzM1J1XV7LivcCa&_nc_ohc=YAQ4RlQnYVAQ7kNvwGua23c&_nc_oc=AdnHk55GgprpRHNYX-ywnrHyusQ2fAy4y2bvR5kLnug1iEJgtx4xukXD3tT9rgm6azo&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.fbkk5-4.fna&oh=03_Q7cD2AGIkEy6mBvpND9syNzbalqkXDrI-CEUzddjvt2BmK-HTQ&oe=683D79CF"
+        src={hero}
         alt="ภาพหลัก"
         className="img-fluid rounded mt-3 hero-image"
         style={{

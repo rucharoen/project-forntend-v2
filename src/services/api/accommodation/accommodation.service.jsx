@@ -34,9 +34,9 @@ const getAvailability = (checkInDate, checkOutDate) => {
 
   return axios.get(`${BASE_URL}/api/accommodation/availableroom`, {
     params: {
-      check_in: checkInDate,
-      check_out: checkOutDate
-    }
+  checkIn: checkInDate,
+  checkOut: checkOutDate
+}
   });
 };
 

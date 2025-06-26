@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Dropdown } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { IconUserCircle } from "@tabler/icons-react";
+import { Icon } from "@iconify/react";
 import LoginModal from "../../pages/main/auth/LoginPage";
+import { OverlayTrigger, Popover } from "react-bootstrap"; // เพิ่มตรงนี้
+
 
 const MainNavbar = ({ isUser, logOut }) => {
   const [showLogin, setShowLogin] = useState(false);
   const [navbarOpen, setNavbarOpen] = useState(false);
+  const [selectedAccommodation, setSelectedAccommodation] = useState([]);
+  const navigate = useNavigate();
 
   const openLogin = () => setShowLogin(true);
   const closeLogin = () => setShowLogin(false);
@@ -22,6 +28,43 @@ const MainNavbar = ({ isUser, logOut }) => {
     };
   }, [showLogin]);
 
+  useEffect(() => {
+    const loadAccommodation = () => {
+      const stored = localStorage.getItem("selectedAccommodation");
+      if (stored) {
+        try {
+          setSelectedAccommodation(JSON.parse(stored));
+        } catch (error) {
+          console.error("Failed to parse selected accommodation:", error);
+          setSelectedAccommodation([]);
+        }
+      } else {
+        setSelectedAccommodation([]);
+      }
+    };
+
+    loadAccommodation();
+
+    const handleAccommodationChanged = () => {
+      loadAccommodation();
+    };
+
+    window.addEventListener("accommodationChanged", handleAccommodationChanged);
+
+    return () => {
+      window.removeEventListener(
+        "accommodationChanged",
+        handleAccommodationChanged
+      );
+    };
+  }, []);
+
+  const handleCartClick = async (e) => {
+    e.preventDefault();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    navigate("/booking-list");
+  };
+
   const toggleNavbar = () => setNavbarOpen(!navbarOpen);
   const closeNavbar = () => setNavbarOpen(false);
 
@@ -33,24 +76,26 @@ const MainNavbar = ({ isUser, logOut }) => {
   };
 
   const handleMenuClick = (menu) => {
-  closeNavbar();
+    closeNavbar();
 
-  setTimeout(() => {
-    if (menu === "หน้าแรก") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else if (menu === "โปรโมชัน") {
-      const section = document.getElementById("PromotionSection");
-      section?.scrollIntoView({ behavior: "smooth" });
-    } else if (menu === "ประเภทห้อง") {
-      const section = document.getElementById("PopularSection");
-      section?.scrollIntoView({ behavior: "smooth" });
-    } else if (menu === "กิจกรรม") {
-      const section = document.getElementById("ActivitySection");
-      section?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, 100); // รอให้ navbar ปิดก่อน
-};
-
+    setTimeout(() => {
+      if (menu === "หน้าแรก") {
+        navigate("/"); // หรือ URL ที่ต้องการ
+      } else if (menu === "โปรโมชัน") {
+        const section = document.getElementById("PromotionSection");
+        section?.scrollIntoView({ behavior: "smooth" });
+      } else if (menu === "ประเภทห้อง") {
+        const section = document.getElementById("PopularSection");
+        section?.scrollIntoView({ behavior: "smooth" });
+      } else if (menu === "กิจกรรม") {
+        const section = document.getElementById("ActivitySection");
+        section?.scrollIntoView({ behavior: "smooth" });
+      } else if (menu === "ติดต่อเรา") {
+        const section = document.getElementById("Contact");
+        section?.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
 
   const renderUserSection = (isMobile = false) => {
     if (!isUser) {
@@ -107,14 +152,18 @@ const MainNavbar = ({ isUser, logOut }) => {
         className="navbar navbar-expand-lg"
         style={{ background: "#f0f0f0", fontSize: "20px" }}
       >
-        <div className="container position-relative">
-          <a className="navbar-brand p-0 m-0 me-3" href="#Home">
+        <div className="container position-relative d-flex align-items-center">
+          <div
+            className="navbar-brand p-0 m-0 me-3"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
             <img
               src="https://www.baraliresort.com/images/logo.png"
               alt="logo"
               height="60"
             />
-          </a>
+          </div>
 
           <button
             className="navbar-toggler ms-auto"
@@ -129,27 +178,29 @@ const MainNavbar = ({ isUser, logOut }) => {
               navbarOpen ? "show" : ""
             }`}
             id="mainNavbar"
+            style={{ flexGrow: 1 }}
           >
             <ul className="navbar-nav mb-2 mb-lg-0 d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-lg-4 px-3 py-4 py-lg-0">
-              {/* ปุ่มเข้าสู่ระบบเฉพาะ mobile */}
               <li className="nav-item d-lg-none">{renderUserSection(true)}</li>
 
-              {/* เมนูหลัก */}
-              {["หน้าแรก", "โปรโมชัน", "ประเภทห้อง", "กิจกรรม", "ติดต่อเรา"].map(
-                (text, i) => (
-                  <li className="nav-item" key={i}>
-                    <a
-                      className="nav-link text-dark"
-                      href="#!"
-                      onClick={() => handleMenuClick(text)}
-                    >
-                      {text}
-                    </a>
-                  </li>
-                )
-              )}
+              {[
+                "หน้าแรก",
+                "โปรโมชัน",
+                "ประเภทห้อง",
+                "กิจกรรม",
+                "ติดต่อเรา",
+              ].map((text, i) => (
+                <li className="nav-item" key={i}>
+                  <a
+                    className="nav-link text-dark"
+                    href="#!"
+                    onClick={() => handleMenuClick(text)}
+                  >
+                    {text}
+                  </a>
+                </li>
+              ))}
 
-              {/* TH/THB mobile only */}
               <li className="nav-item d-flex align-items-center gap-2 d-lg-none mt-2">
                 <img
                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-ick2xvSWyHyDFgl5YWf3xLQ8qRKQByx2ScOAjyEoiA&s&ec=72940543"
@@ -160,28 +211,82 @@ const MainNavbar = ({ isUser, logOut }) => {
                 <span>TH/THB</span>
               </li>
             </ul>
+          </div>
 
-            {/* ส่วนผู้ใช้ desktop */}
-            <div className="d-none d-lg-flex align-items-center gap-3 ms-auto">
-              <div className="d-flex align-items-center">
-                <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-ick2xvSWyHyDFgl5YWf3xLQ8qRKQByx2ScOAjyEoiA&s&ec=72940543"
-                  alt="ธง"
-                  width="32"
-                  height="24"
-                  className="me-2"
-                />
-                <span>TH/THB</span>
-              </div>
-              {renderUserSection(false)}
+          {/* ปุ่มรถเข็นอยู่ตรงนี้ ให้ชิดขวา */}
+          <OverlayTrigger
+  trigger="click"
+  placement="bottom"
+  rootClose
+  overlay={
+    <Popover
+      id="cart-popover"
+      style={{ left: "50%", transform: "translateX(-50%)" }} // ตรงกลางแนวนอน
+    >
+      <Popover.Header as="h3">รายการที่เลือก</Popover.Header>
+      <Popover.Body>
+        {selectedAccommodation.length > 0 ? (
+          <ul className="list-unstyled mb-0">
+            {selectedAccommodation.map((room, index) => (
+              <li key={index}>
+                • {room.name || `ห้องพัก ${index + 1}`}
+              </li>
+            ))}
+            <hr />
+            <button
+              className="btn btn-primary btn-sm w-100"
+              onClick={() => navigate("/booking-list")}
+            >
+              ไปยังรายการจอง
+            </button>
+          </ul>
+        ) : (
+          <div>ไม่มีรายการในรถเข็น</div>
+        )}
+      </Popover.Body>
+    </Popover>
+  }
+>
+  <button
+    type="button"
+    className="btn position-relative ms-3"
+    style={{ backgroundColor: "rgba(240, 240, 240, 1)" }}
+  >
+    <Icon icon="mdi-light:cart" width="24" height="24" />
+    {selectedAccommodation.length > 0 && (
+      <span
+        className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+        style={{ fontSize: "0.6rem", minWidth: "1.2rem" }}
+      >
+        {selectedAccommodation.length}
+        <span className="visually-hidden">รายการในรถเข็น</span>
+      </span>
+    )}
+  </button>
+</OverlayTrigger>
+
+
+          {/* ส่วนเมนูผู้ใช้บน desktop */}
+          <div className="d-none d-lg-flex align-items-center gap-3 ms-3">
+            <div className="d-flex align-items-center">
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-ick2xvSWyHyDFgl5YWf3xLQ8qRKQByx2ScOAjyEoiA&s&ec=72940543"
+                alt="ธง"
+                width="32"
+                height="24"
+                className="me-2"
+              />
+              <span>TH/THB</span>
             </div>
+            {renderUserSection(false)}
           </div>
         </div>
       </nav>
 
-      {showLogin && <LoginModal showLogin={showLogin} closeLogin={closeLogin} />}
+      {showLogin && (
+        <LoginModal showLogin={showLogin} closeLogin={closeLogin} />
+      )}
 
-      {/* CSS ลอย overlay menu บน mobile */}
       <style>{`
         @media (max-width: 991.98px) {
           .mobile-overlay {

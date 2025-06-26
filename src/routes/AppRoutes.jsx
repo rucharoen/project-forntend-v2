@@ -20,6 +20,7 @@ import DashboardPage from "../pages/admin/dashboard/DashboardPage"
 import QrcodePage from "../pages/main/Book/QrcodePage"
 import CreditCardPage from "../pages/main/Book/CreditCardPage"
 import ReceiptPage from "../pages/main/Book/ReceiptPage"
+import BookingList from "../pages/main/Book/BookingList"
 
 const AppRoutes = () => {
   return (
@@ -48,6 +49,7 @@ const AppRoutes = () => {
       </Route>
 
       <Route path="*" element={<Navigate to="/" />} />
+      <Route path="booking-list" element={<BookingList />} />
     </Routes>
   )
 }
