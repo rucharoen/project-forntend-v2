@@ -1,3 +1,5 @@
+//การตั้งเงื่อนไข ห้อง ผู้ใหญ่ เด็ก
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -104,18 +106,81 @@ const SearchBox = ({
     setGuestPopupVisible((prev) => !prev);
   };
 
+  // กำหนด lookup สำหรับจำนวนเด็กสูงสุดตามห้องและผู้ใหญ่
+  const childrenLookup = {
+    "1-1": (0,1,2,3),
+    "1-2": (0,1),
+    "1-3": (0,1),
+    "2-2": (0,1,2,3,4,5,6),
+    "2-3": (0,1,2,3,4),
+    "2-4": (0,1,2,3),
+    "2-5": (0,1,2),
+    "2-6": (0,1,2),
+    "3-1": 10,
+    "3-2": 9,
+    "3-3": 9,
+    "3-4": 7,
+    "3-5": 6,
+    "3-6": 5,
+    "3-7": 4,
+    "3-8": 3,
+    "3-9": 3,
+    // เพิ่มเติมถ้าต้องการ
+  };
+
+  // หาจำนวนเด็กสูงสุด ตาม lookup หรือ fallback (ห้อง*3 - ผู้ใหญ่)
+  const getMaxChildren = (rooms, adults) => {
+    const key = `${rooms}-${adults}`;
+    if (childrenLookup.hasOwnProperty(key)) {
+      return childrenLookup[key];
+    }
+    const fallback = rooms * 3 - adults;
+    return fallback > 0 ? fallback : 0;
+  };
+
+  const getMaxAdults = (rooms) => rooms * 3;
+
   const changeCount = (key, delta) => {
-    if (key === "rooms") setRoomsCount((prev) => Math.min(5, Math.max(1, prev + delta)));
-    if (key === "adults")
-      setAdultsCount((prev) => {
-        const newVal = Math.max(1, prev + delta);
-        return newVal + childrenCount <= 4 ? newVal : prev;
-      });
-    if (key === "children")
-      setChildrenCount((prev) => {
-        const newVal = Math.max(0, prev + delta);
-        return newVal + adultsCount <= 4 ? newVal : prev;
-      });
+    let newRooms = roomsCount;
+    let newAdults = adultsCount;
+    let newChildren = childrenCount;
+
+    if (key === "rooms") {
+      newRooms = Math.max(1, Math.min(3, roomsCount + delta)); // limit ห้อง 1-9
+
+      // ปรับผู้ใหญ่และเด็กตามจำนวนห้องใหม่
+      const maxAdults = getMaxAdults(newRooms);
+      if (newAdults > maxAdults) newAdults = maxAdults;
+
+      const maxChildren = getMaxChildren(newRooms, newAdults);
+      if (newChildren > maxChildren) newChildren = maxChildren;
+
+      setRoomsCount(newRooms);
+      setAdultsCount(newAdults);
+      setChildrenCount(newChildren);
+      return;
+    }
+
+    if (key === "adults") {
+      const maxAdults = getMaxAdults(roomsCount);
+      newAdults = Math.max(1, Math.min(maxAdults, adultsCount + delta));
+
+      const maxChildren = getMaxChildren(roomsCount, newAdults);
+      if (newChildren > maxChildren) newChildren = maxChildren;
+
+      setAdultsCount(newAdults);
+      setChildrenCount(newChildren);
+      return;
+    }
+
+    if (key === "children") {
+      const maxChildren = getMaxChildren(roomsCount, adultsCount);
+      newChildren = Math.max(0, childrenCount + delta);
+      if (newChildren > maxChildren) return; // ไม่ให้เกิน limit
+
+      setChildrenCount(newChildren);
+      return;
+    }
   };
 
   const handleSearch = async (e) => {
@@ -194,13 +259,37 @@ const SearchBox = ({
             </div>
             {guestPopupVisible && createPortal(
               <div className="guest-popup" style={guestPopupPos}>
-                {[{ label: "ห้อง", key: "rooms", val: roomsCount }, { label: "ผู้ใหญ่", key: "adults", val: adultsCount }, { label: "เด็ก", key: "children", val: childrenCount }].map(({ label, key, val }) => (
+                {[
+                  { label: "ห้อง", key: "rooms", val: roomsCount },
+                  { label: "ผู้ใหญ่", key: "adults", val: adultsCount },
+                  { label: "เด็ก", key: "children", val: childrenCount }
+                ].map(({ label, key, val }) => (
                   <div key={key} className="guest-row">
                     <span>{label}</span>
                     <div className="counter">
-                      <button onClick={(e) => { e.stopPropagation(); changeCount(key, -1); }}>-</button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          changeCount(key, -1);
+                        }}
+                        disabled={
+                          (key === "adults" && val <= 1) ||
+                          (key === "children" && val <= 0) ||
+                          (key === "rooms" && val <= 1)
+                        }
+                      >-</button>
                       <span>{val}</span>
-                      <button onClick={(e) => { e.stopPropagation(); changeCount(key, 1); }}>+</button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          changeCount(key, 1);
+                        }}
+                        disabled={
+                          (key === "adults" && val >= getMaxAdults(roomsCount)) ||
+                          (key === "children" && val >= getMaxChildren(roomsCount, adultsCount)) ||
+                          (key === "rooms" && val >= 9)
+                        }
+                      >+</button>
                     </div>
                   </div>
                 ))}

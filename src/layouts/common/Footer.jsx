@@ -13,6 +13,7 @@ const Footer = () => {
     <footer
       className="py-4 text-dark"
       style={{ backgroundColor: "rgba(240, 240, 240, 1)" }}
+      id="Contact"
     >
       <Container>
         <Row>

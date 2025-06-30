@@ -11,7 +11,8 @@ const AuthLayout = () => {
         <ProtectedRoute roles={["ROLE_MEMBER", "ROLE_ADMIN", "ROLE_MODERATOR"]}>
             <Navbar isUser={isUser} logOut={logOut} />
             <Outlet />
-            <Footer />
+            <Footer id="Contact" />
+
         </ProtectedRoute>
     )
 }
