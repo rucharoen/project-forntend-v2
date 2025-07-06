@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import "../../css/Trolley.css"
 
-const Trolley = ({ showCart, setShowCart, selectedAccommodation, setSelectedAccommodation }) => {
+const Trolley = ({
+  showCart,
+  setShowCart,
+  selectedAccommodation,
+  setSelectedAccommodation,
+}) => {
   const navigate = useNavigate();
   const [selectedItems, setSelectedItems] = useState([]);
 
@@ -13,38 +19,62 @@ const Trolley = ({ showCart, setShowCart, selectedAccommodation, setSelectedAcco
   };
 
   const handleRemoveItem = (indexToRemove) => {
-    const updatedAccommodation = selectedAccommodation.filter((_, idx) => idx !== indexToRemove);
+    const updatedAccommodation = selectedAccommodation.filter(
+      (_, idx) => idx !== indexToRemove
+    );
     setSelectedAccommodation(updatedAccommodation);
 
-    setSelectedItems((prev) =>
-      prev
-        .filter((idx) => idx !== indexToRemove)
-        .map((idx) => (idx > indexToRemove ? idx - 1 : idx)) // อัปเดต index หลังลบ
+    localStorage.setItem(
+      "selectedAccommodation",
+      JSON.stringify(updatedAccommodation)
+    );
+
+    setSelectedItems(
+      (prev) =>
+        prev
+          .filter((idx) => idx !== indexToRemove)
+          .map((idx) => (idx > indexToRemove ? idx - 1 : idx)) // อัปเดต index หลังลบ
     );
   };
 
   const totalSelectedPrice = selectedItems.reduce(
-    (sum, idx) => sum + (selectedAccommodation[idx]?.discountedPrice || 0),
+    (sum, idx) =>
+      sum + Number(selectedAccommodation[idx]?.discountedPrice || 0),
     0
   );
 
+  useEffect(() => {
+    setSelectedItems(selectedAccommodation.map((_, idx) => idx));
+  }, [selectedAccommodation]);
+
   return (
-    <Modal show={showCart} onHide={() => setShowCart(false)} centered size="lg">
+    <Modal
+  show={showCart}
+  onHide={() => setShowCart(false)}
+  centered
+  size="lg"
+  dialogClassName="custom-modal-width"
+>
       <Modal.Header closeButton>
         <Modal.Title>รถเข็น ({selectedAccommodation.length})</Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ maxHeight: "600px", overflowY: "auto" }}>
+      <Modal.Body style={{ maxHeight: "700px", overflowY: "auto" }}>
         {selectedAccommodation.map((state, index) => (
           <div key={index} className="card mb-3 p-3">
             <div className="row g-3 align-items-center">
+              <input
+                type="checkbox"
+                className="form-check-input position-absolute"
+                style={{
+                  top: "50%",
+                  left: "10px",
+                  transform: "translateY(-50%) scale(1.5)",
+                }}
+                checked={selectedItems.includes(index)}
+                onChange={() => toggleSelect(index)}
+              />
+
               <div className="col-md-4 position-relative">
-                <input
-                  type="checkbox"
-                  className="form-check-input position-absolute"
-                  style={{ top: "10px", left: "10px", transform: "scale(1.5)" }}
-                  checked={selectedItems.includes(index)}
-                  onChange={() => toggleSelect(index)}
-                />
                 <img
                   src={state.image || "https://picsum.photos/id/57/800/600"}
                   alt="ห้องพัก"
@@ -59,12 +89,22 @@ const Trolley = ({ showCart, setShowCart, selectedAccommodation, setSelectedAcco
               <div className="col-md-8">
                 <div className="d-flex justify-content-between align-items-start flex-column flex-md-row">
                   <div>
-                    <h5 className="fw-bold">{state.name || `ห้องพัก ${index + 1}`}</h5>
-                    <ul className="list-unstyled mb-2 text-muted small">
-                      <li>🛏️ รวมอาหารเช้าระดับยอดเยี่ยม</li>
-                      <li>📶 ฟรีอินเทอร์เน็ตไร้สาย (Wi-Fi)</li>
-                      <li>➕ ส่วนลด 10% เฉพาะค่าอาหารที่ห้องอาหารโรงแรม</li>
+                    <h5 className="fw-bold">
+                      {state.name || `ห้องพัก ${index + 1}`}
+                    </h5>
+                    <ul>
+                      {(Array.isArray(state.amenities)
+                        ? state.amenities
+                        : typeof state.amenities === "string"
+                        ? state.amenities.split(",").map((item) => item.trim())
+                        : []
+                      )
+                        .slice(0, 5) // จำกัด 5 รายการแรก
+                        .map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
                     </ul>
+
                     <button
                       className="btn btn-outline-danger btn-sm"
                       onClick={() => handleRemoveItem(index)}
@@ -85,7 +125,9 @@ const Trolley = ({ showCart, setShowCart, selectedAccommodation, setSelectedAcco
                     <div className="fs-4 fw-bold text-success">
                       ฿ {state.discountedPrice?.toLocaleString() || "14,280"}
                     </div>
-                    <div className="text-muted small">รวมภาษีและค่าธรรมเนียม</div>
+                    <div className="text-muted small">
+                      รวมภาษีและค่าธรรมเนียม
+                    </div>
                     <div className="input-group input-group-sm mt-2 w-auto mx-auto">
                       <button className="btn btn-outline-secondary">-</button>
                       <input
@@ -106,7 +148,9 @@ const Trolley = ({ showCart, setShowCart, selectedAccommodation, setSelectedAcco
 
         <div className="card p-3 mb-3">
           <div className="d-flex justify-content-between align-items-center">
-            <div className="fw-bold fs-5">ทั้งหมด (เลือก {selectedItems.length} รายการ)</div>
+            <div className="fw-bold fs-5">
+              ทั้งหมด (เลือก {selectedItems.length} รายการ)
+            </div>
             <div className="d-flex align-items-center gap-3">
               <div className="fs-5 fw-bold text-success">
                 ฿ {totalSelectedPrice.toLocaleString()}
@@ -124,6 +168,7 @@ const Trolley = ({ showCart, setShowCart, selectedAccommodation, setSelectedAcco
                       price: selectedRoom.discountedPrice,
                       checkIn: selectedRoom.checkIn,
                       checkOut: selectedRoom.checkOut,
+                      amenities: selectedRoom.amenities,
                     },
                   });
                 }}

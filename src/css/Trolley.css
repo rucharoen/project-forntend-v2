@@ -1,0 +1,5 @@
+.custom-modal-width .modal-dialog {
+  max-width: 1200px;  /* ปรับขนาดที่ต้องการ */
+  width: 100%;
+  margin: auto;       /* จัดกึ่งกลาง */
+}

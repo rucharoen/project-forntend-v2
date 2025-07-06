@@ -49,7 +49,6 @@ const SearchPage = () => {
   const [availabilityData, setAvailabilityData] = useState({});
   const [filters, setFilters] = useState(defaultFilters);
   const [showImageModal, setShowImageModal] = useState(false);
-  const [modalImages, setModalImages] = useState([]);
   const [roomQuantities, setRoomQuantities] = useState({});
   const [selectedAccommodation, setSelectedAccommodation] = useState([]);
   const [promotions, setPromotions] = useState([]);
@@ -81,7 +80,12 @@ const SearchPage = () => {
     setLoading(true);
     try {
       const res = destination
-        ? await AccommodationService.getSearch(destination, checkIn, checkOut, guests)
+        ? await AccommodationService.getSearch(
+            destination,
+            checkIn,
+            checkOut,
+            guests
+          )
         : await AccommodationService.getAll();
       setOriginalResults(res?.data || []);
     } catch (error) {
@@ -96,16 +100,16 @@ const SearchPage = () => {
   }, [fetchData]);
 
   useEffect(() => {
-  if (checkInDate && checkOutDate) {
-    GetRoomAvailability(checkInDate, checkOutDate).then(setAvailabilityData);
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
-
+    if (checkInDate && checkOutDate) {
+      GetRoomAvailability(checkInDate, checkOutDate).then(setAvailabilityData);
+    }
+  }, [checkInDate, checkOutDate]);
 
   const filteredResultsWithPromo = useMemo(() => {
     return originalResults
-      .filter((acc) => !destination || String(acc.type?.name) === String(destination))
+      .filter(
+        (acc) => !destination || String(acc.type?.name) === String(destination)
+      )
       .map((acc) => {
         const matchedPromo = promotions.find(
           (promo) =>
@@ -113,16 +117,16 @@ const SearchPage = () => {
             new Date(promo.start_date) <= new Date() &&
             new Date() <= new Date(promo.end_date)
         );
-        const discountPercent = matchedPromo?.discount_percentage || 0;
+        const discount = matchedPromo?.discount || 0;
         const discountedPrice =
-          discountPercent > 0
-            ? Math.round(acc.price_per_night * (1 - discountPercent / 100))
+          discount > 0
+            ? Math.round(acc.price_per_night * (1 - discount / 100))
             : acc.price_per_night;
 
         return {
           ...acc,
           promo: matchedPromo,
-          discountPercent,
+          discount,
           discountedPrice,
         };
       });
@@ -144,9 +148,17 @@ const SearchPage = () => {
         return;
       }
       if (!selectedAccommodation.some((a) => a.id === acc.id)) {
-        const newSelection = [...selectedAccommodation, acc];
+        const accWithImage = {
+          ...acc,
+          image: getImageUrl(acc.image_name),
+          amenities: acc.amenities?.split(",").map((a) => a.trim()) || [],
+        };
+        const newSelection = [...selectedAccommodation, accWithImage];
         setSelectedAccommodation(newSelection);
-        localStorage.setItem("selectedAccommodation", JSON.stringify(newSelection));
+        localStorage.setItem(
+          "selectedAccommodation",
+          JSON.stringify(newSelection)
+        );
         window.dispatchEvent(new Event("accommodationChanged"));
       }
     },
@@ -186,8 +198,8 @@ const SearchPage = () => {
       name: acc.name,
       images: [
         getImageUrl(acc.image_name),
-        "https://picsum.photos/id/58/400/300",
-        "https://picsum.photos/id/59/400/300",
+        getImageUrl(acc.image_name2),
+        getImageUrl(acc.image_name3),
       ],
       facilities: (acc.amenities?.split(",") || []).map((a) => a.trim()),
     });
@@ -199,13 +211,15 @@ const SearchPage = () => {
   return (
     <div className="search-page">
       <SearchBox
-  resetFilter={resetFilters}
-  destination={destination}
-  checkIn={checkIn}
-  checkOut={checkOut}
-  guests={parseInt(guests) || 1}  // เผื่อเป็น string ให้เป็น number
-/>
-      <div className="result-count">พบ {filteredResultsWithPromo.length} รายการ</div>
+        resetFilter={resetFilters}
+        destination={destination}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        guests={parseInt(guests) || 1}
+      />
+      <div className="result-count">
+        พบ {filteredResultsWithPromo.length} รายการ
+      </div>
 
       <div className="room-box">
         <div className="room-grid">
@@ -213,66 +227,152 @@ const SearchPage = () => {
             <div className="room-card" key={acc.id}>
               <div className="room-left">
                 <h5 className="room-name">{acc.name}</h5>
-                <img src={getImageUrl(acc.image_name)} className="room-main-img" alt={acc.name} />
+                <img
+                  src={getImageUrl(acc.image_name)}
+                  className="room-main-img"
+                  alt={acc.name}
+                />
                 <div className="room-sub-images">
-                  {[102, 103].map((id) => (
-                    <img key={id} src={`https://picsum.photos/id/${id}/400/300`} alt="" className="room-sub-img" />
+                  {[acc.image_name2, acc.image_name3].map((imgName, index) => (
+                    <img
+                      key={index}
+                      src={getImageUrl(imgName)}
+                      alt={acc.name}
+                      className="room-sub-img"
+                    />
                   ))}
                 </div>
+
                 <div className="room-meta">
-                  <div><i className="bi bi-tv me-2"></i>{acc.bed_type || "เตียงแฝด หรือ เตียงใหญ่"}</div>
-                  <div><i className="bi bi-aspect-ratio me-2"></i>{acc.room_size || "47 ตร.ม. 50.59 ตร.ฟุต"}</div>
+                  <div>
+                    <i className="bi bi-tv me-2"></i>
+                    {acc.bed_type || "เตียงแฝด หรือ เตียงใหญ่"}
+                  </div>
+                  <div>
+                    <i className="bi bi-aspect-ratio me-2"></i>
+                    {acc.room_size || "47 ตร.ม. 50.59 ตร.ฟุต"}
+                  </div>
                 </div>
                 <div className="room-detail-link-wrapper">
-                  <button className="room-detail-link" onClick={() => openImageModal(acc)}>คลิกดูรายละเอียดห้องและรูปเพิ่มเติม</button>
+                  <button
+                    className="room-detail-link"
+                    onClick={() => openImageModal(acc)}
+                  >
+                    คลิกดูรายละเอียดห้องและรูปเพิ่มเติม
+                  </button>
                 </div>
               </div>
 
-              <div className="room-right">
+              <div className="room-right d-flex flex-column">
                 <div className="room-title">รายละเอียดห้องพัก</div>
-                <div className="room-option">
+                <div className="room-option flex-grow-1">
                   <div className="room-amenities">
                     <ul className="amenities-list">
-                      {(acc.amenities?.split(",") || []).filter(Boolean).map((item, i) => (
-                        <li key={i}>{item.trim()}</li>
-                      ))}
+                      {(acc.amenities?.split(",") || [])
+                        .filter(Boolean)
+                        .map((item, i) => (
+                          <li key={i}>{item.trim()}</li>
+                        ))}
                     </ul>
                   </div>
 
                   <hr className="vertical-divider" />
 
-                  <div className="room-pricing">
-                    {acc.discountPercent > 0 && (
+                  <div className="room-pricing d-flex flex-column">
+                    {acc.discount > 0 && (
                       <>
                         <div className="discount">
                           <span className="text-gray">ประหยัด </span>
-                          <span className="text-red">{acc.discountPercent}%</span>
+                          <span className="text-red">{acc.discount}%</span>
                         </div>
-                        <div className="price-strike">{acc.price_per_night.toLocaleString()} บาท</div>
+                        <div className="price-strike">
+                          {acc.price_per_night.toLocaleString()} บาท
+                        </div>
                       </>
                     )}
                     <div className="rating">
-                      {acc.discountPercent > 0 ? "★★★★★" : "★★★★☆"} <small>({acc.rating})</small>
+                      {acc.discount > 0 ? "★★★★★" : "★★★★☆"}{" "}
+                      <small>({acc.rating})</small>
                     </div>
-                    <div className="price text-success">{acc.discountedPrice.toLocaleString()} THB/คืน</div>
-                    <div className="price-note">รวมภาษีและค่าธรรมเนียม</div>
+                    
+                    
 
-                    <div className="d-flex align-items-center flex-wrap gap-2 mt-3">
-                      <div className="room-quantity d-flex align-items-center">
-                        <button onClick={() => updateRoomQuantity(acc.id, -1)} className="btn btn-sm btn-outline-secondary" style={{ minWidth: "32px", height: "32px" }}>−</button>
-                        <span className="mx-2">{roomQuantities[acc.id] || 1}</span>
-                        <button onClick={() => updateRoomQuantity(acc.id, 1)} className="btn btn-sm btn-outline-secondary" style={{ minWidth: "32px", height: "32px" }}>+</button>
+                    {/* กลุ่ม price-note + ปุ่ม อยู่ข้างล่างสุดของ .room-pricing */}
+                    <div className="mt-auto">
+                      <div className="price text-success ">
+                      {acc.discountedPrice.toLocaleString()} THB/คืน
+                    </div>
+                      <div className="price-note mb-2">
+                        รวมภาษีและค่าธรรมเนียม
                       </div>
-                      {selectedAccommodation.some((a) => a.id === acc.id) ? (
-                        <button className="btn btn-secondary btn-sm" disabled style={{ minWidth: "110px", height: "32px" }}>เพิ่มแล้ว</button>
-                      ) : (
-                        <button className="btn btn-sm" onClick={() => handleAddToBooking(acc)} style={{ minWidth: "110px", height: "32px", fontSize: "13px", fontWeight: 600, border: "1px solid rgba(114, 181, 77, 1)", color: "#5B873AE0", backgroundColor: "white" }}>เพิ่มในรถเข็น</button>
-                      )}
-                      <button onClick={() => handleBooking(acc)} className="btn btn-sm" style={{ backgroundColor: "rgba(114, 181, 77, 1)", color: "#fff", fontSize: "13px", fontWeight: 600, minWidth: "110px", height: "32px" }}>จองเลยตอนนี้</button>
+
+                      <div className="d-flex align-items-center flex-wrap gap-2">
+                        <div className="room-quantity d-flex align-items-center">
+                          <button
+                            onClick={() => updateRoomQuantity(acc.id, -1)}
+                            className="btn btn-sm btn-outline-secondary"
+                            style={{ minWidth: "32px", height: "32px" }}
+                          >
+                            −
+                          </button>
+                          <span className="mx-2">
+                            {roomQuantities[acc.id] || 1}
+                          </span>
+                          <button
+                            onClick={() => updateRoomQuantity(acc.id, 1)}
+                            className="btn btn-sm btn-outline-secondary"
+                            style={{ minWidth: "32px", height: "32px" }}
+                          >
+                            +
+                          </button>
+                        </div>
+                        {selectedAccommodation.some((a) => a.id === acc.id) ? (
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            disabled
+                            style={{ minWidth: "110px", height: "32px" }}
+                          >
+                            เพิ่มแล้ว
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-sm"
+                            onClick={() => handleAddToBooking(acc)}
+                            style={{
+                              minWidth: "110px",
+                              height: "32px",
+                              fontSize: "13px",
+                              fontWeight: 600,
+                              border: "1px solid rgba(114, 181, 77, 1)",
+                              color: "#5B873AE0",
+                              backgroundColor: "white",
+                            }}
+                          >
+                            เพิ่มในรถเข็น
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleBooking(acc)}
+                          className="btn btn-sm"
+                          style={{
+                            backgroundColor: "rgba(114, 181, 77, 1)",
+                            color: "#fff",
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            minWidth: "110px",
+                            height: "32px",
+                          }}
+                        >
+                          จองเลยตอนนี้
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                
               </div>
+
               <hr />
             </div>
           ))}
@@ -294,5 +394,3 @@ const SearchPage = () => {
 };
 
 export default SearchPage;
-
-

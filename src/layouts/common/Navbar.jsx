@@ -6,7 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { IconUserCircle } from "@tabler/icons-react";
 import { Icon } from "@iconify/react";
 import LoginModal from "../../pages/main/auth/LoginPage";
-import Trolley from "./trolley";
+import Trolley from "./Trolley";
 
 const MainNavbar = ({ isUser, logOut }) => {
   const [showLogin, setShowLogin] = useState(false);
@@ -190,12 +190,11 @@ const MainNavbar = ({ isUser, logOut }) => {
           </button>
 
           <Trolley
-  showCart={showCart}
-  setShowCart={setShowCart}
-  selectedAccommodation={selectedAccommodation}
-  setSelectedAccommodation={setSelectedAccommodation}
-/>
-
+            showCart={showCart}
+            setShowCart={setShowCart}
+            selectedAccommodation={selectedAccommodation}
+            setSelectedAccommodation={setSelectedAccommodation}
+          />
 
           <div className="d-none d-lg-flex align-items-center gap-3 ms-3">
             <div className="d-flex align-items-center">
